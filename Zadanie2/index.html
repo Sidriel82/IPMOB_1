@@ -8,7 +8,7 @@
 <a href="https://github.com/Sidriel82/IPMOB_1/blob/main/zad1.html" target=”_blank”>kod</a> <br />
 
 	<form>
-	<label for="adres_email" required>1. Adres email:</label>
+	<label for="adres_email" required="required">1. Adres email:</label>
 	<input type="email" id="adres_email" name="adres_email"
 	pattern="[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,}$" title="Adres email" placeholder="email@gmail.com"><br><br>
 	</input>
@@ -64,7 +64,10 @@
     </input>
 	
 	<label for="kalendarz">11 Kalendarz:</label>
-	<input type="date" name="kalendarz" value="" />
+	<input type="date" name="kalendarz" value="" /></br></br>
+	
+	<label for="kalendarz_tydz">11 Kalendarz ten tydzień:</label>
+	<input type="date" name="party" min="2021-03-15" max="2021-03-21" />
 	
 	<input type="submit">
 	

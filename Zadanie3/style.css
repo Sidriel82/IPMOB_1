@@ -1,0 +1,12 @@
+body
+{
+margin-left: 0;
+margin-right: 0;	
+}
+
+#platform
+{
+	height: 100px;
+	width: 80%;
+	background-color: blue;
+}

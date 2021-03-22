@@ -1,14 +1,48 @@
+<!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href="style.css" />
-<title>Zadanie3</title>
+<meta charset="UTF-8">
+<title>Drag and drop - HTML5 Canvas</title>
+	<title>Zadanie3</title>
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	<script src="https://unpkg.com/konva@7.2.5/konva.min.js"></script>
 </head>
+<div id="container"></div>
+    <script>
+      var width = window.innerWidth;
+      var height = window.innerHeight;
 
-<body>
-<a href="https://sidriel82.github.io/IPMOB_1/Zadanie2/index.html" target=”_blank”>html</a><br>
-<a href="https://github.com/Sidriel82/IPMOB_1/blob/main/Zadanie2/index.html" target=”_blank”>kod</a> <br />
+      var stage = new Konva.Stage({
+        container: 'container',
+        width: width,
+        height: height,
+      });
 
+      var layer = new Konva.Layer();
+      var rectX = stage.width() / 2 - 50;
+      var rectY = stage.height() / 2 - 25;
+
+      var box = new Konva.Rect({
+        x: rectX,
+        y: rectY,
+        width: 100,
+        height: 50,
+        fill: '#00D2FF',
+        stroke: 'black',
+        strokeWidth: 4,
+        draggable: true,
+      });
+
+      // add cursor styling
+      box.on('mouseover', function () {
+        document.body.style.cursor = 'pointer';
+      });
+      box.on('mouseout', function () {
+        document.body.style.cursor = 'default';
+      });
+
+      layer.add(box);
+      stage.add(layer);
+    </script>
 </body>
-<div id="platform"></div>
-
 </html>

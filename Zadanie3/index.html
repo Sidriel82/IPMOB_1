@@ -49,22 +49,38 @@
             var i, len = blocks.length;
             mouseX = event.clientX;
             mouseY = event.clientY;
-           
+            for (i = 0; i < len; i++) {
+                if (blocks[i]) {
+                    drag = true;
+                    dragIndex = i;
+                }
+            }
+            if (drag) {
+                window.addEventListener("mousemove", mouseMove, false);
+            }
+            canvas.removeEventListener("mousedown", mouseDown, false);
+            window.addEventListener("mouseup", mouseUp, false);
+            return false;
         }
 
-        function mouseMove(e) {
-
-            var posX, posY;
+        function mouseMove(event) {
             var minX = 0;
             var maxX = (canvas.width) * 0.8;
             var minY = 0;
             var maxY = canvas.height;
 
-           
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+
+            blocks[dragIndex].x = mouseX;
+            blocks[dragIndex].y = mouseY;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBlocks();
         }
 
         function mouseUp() {
-       
+
         }
         canvas.addEventListener("mousedown", mouseDown, false);
     </script>

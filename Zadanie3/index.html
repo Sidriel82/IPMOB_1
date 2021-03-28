@@ -72,6 +72,11 @@
             mouseX = event.clientX;
             mouseY = event.clientY;
 
+            if (mouseX + blocks[dragIndex].width >= maxX) mouseX = maxX - blocks[dragIndex].width;
+            if (mouseX <= minX) mouseX = 0;
+            if (mouseY + blocks[dragIndex].height >= maxY) mouseY = maxY - blocks[dragIndex].height;
+            if (mouseY <= minY) mouseY = 0;
+
             blocks[dragIndex].x = mouseX;
             blocks[dragIndex].y = mouseY;
 
@@ -80,7 +85,12 @@
         }
 
         function mouseUp() {
-
+            canvas.addEventListener("mousedown", mouseDown, false);
+            window.removeEventListener("mouseup", mouseUp, false);
+            if (drag) {
+                drag = false;
+                window.removeEventListener("mousemove", mouseMove, false);
+            }
         }
         canvas.addEventListener("mousedown", mouseDown, false);
     </script>

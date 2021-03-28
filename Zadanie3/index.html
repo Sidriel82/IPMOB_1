@@ -36,5 +36,36 @@
             drawBlocks();
         }
 
+        function drawBlocks() {
+
+            for (var i = 0; i < blocks.length; i++) {
+                ctx.fillStyle = blocks[i].color;
+                ctx.beginPath();
+                ctx.fillRect(blocks[i].x, blocks[i].y, blocks[i].width, blocks[i].height);
+            }
+        }
+
+        function mouseDown(event) {
+            var i, len = blocks.length;
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+           
+        }
+
+        function mouseMove(e) {
+
+            var posX, posY;
+            var minX = 0;
+            var maxX = (canvas.width) * 0.8;
+            var minY = 0;
+            var maxY = canvas.height;
+
+           
+        }
+
+        function mouseUp() {
+       
+        }
+        canvas.addEventListener("mousedown", mouseDown, false);
     </script>
 </body></html>

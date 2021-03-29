@@ -1,10 +1,7 @@
 <html>
 <head>
-
-</head>
-<body>
-<!--CSS-->
 <style>
+<!--CSS-->
 body
 { 
   width: auto;
@@ -14,7 +11,16 @@ body
 {
 background-color: yellow;
 }
+ol
+{
+border: 1px solid black;
+}
 li
+{
+background-color: orange;
+border: 1px solid black;
+}
+p
 {
 background-color: orange;
 border: 1px solid black;
@@ -34,6 +40,13 @@ $(function()
 	  }
   );
 </script>
+</head>
+<body>
+
+
+<p>	<b>Dodawanie elementów</b> - należy wybrać miejsce na liście w którym chce się dodać element poprzez przyciśnięcie pola przy danym numerze listy
+	<b>Przesuwanie elementów</b> - należy chwycić za pole danego elementu listy. Jeżeli wcześnie wprowadzało się dodatkowe elementy listy najpierw należy kliknąć poza listę w celu wyłączenia opcji edycji</p>
+		
 <div id="container">
     <ol class="sortable" contenteditable="true">
         <li>Element nr.1</li>

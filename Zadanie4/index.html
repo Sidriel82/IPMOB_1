@@ -3,6 +3,7 @@
 
 </head>
 <body>
+<!--CSS-->
 <style>
 body
 { 
@@ -20,6 +21,19 @@ border: 1px solid black;
 }
 </style>
 
+<!--JS-->
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+$(function() 
+	{
+		$('ol').on("mousedown",function(){
+		$('ol').sortable();
+		}
+		);
+	  }
+  );
+</script>
 <div id="container">
     <ol class="sortable" contenteditable="true">
         <li>Element nr.1</li>

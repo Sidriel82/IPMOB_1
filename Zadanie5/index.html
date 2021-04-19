@@ -13,8 +13,16 @@
 		<label for="tel">Nr. Tel: </label> <input id="add_tel" type="text" placeholder="570-123-421" pattern="[0-9]{3}(-)?[0-9]{3}(-)?[0-9]{3}"><br><br>
 		<label for="adres">Adres: </label> <input id="add_address" type="text" placeholder="11-100" pattern="[0-9]{2}-[0-9]{3}"><br><br>
 		<button onclick="addEmployee()">Add user</button>
-    </fieldset>
+    </fieldset></br>
 
+	
+	<button onclick="deleteEmployee()">Delete User</button>
+    <input id="delete_id" type="text" placeholder="ID"></br></br>
+	
+	<button onclick="searchEmployee()">Search User</button>
+    <input id="search_id" type="text" placeholder="Name"></br></br>
+
+	
     <table border=1>
         <thead>
             <th style="width:2em">ID</th>
@@ -22,20 +30,12 @@
             <th style="width:6em">Nazwisko</th>
 			<th style="width:6em">Nr. dowodu</th>
             <th style="width:14em">Email</th>
-			<th style="width:2em">Tel</th>
-			<th style="width:2em">Adres</th>
+			<th style="width:6em">Tel</th>
+			<th style="width:6em">Adres</th>
 			
         </thead>
     </table>
 	</br>
-	
-	<button onclick="deleteEmployee()">Delete User</button>
-    <input id="delete_id" type="text" placeholder="ID"></br></br>
-	
-	<button onclick="searchEmployee()">Search User</button>
-    <input id="search_id" type="text" placeholder="Name">
-
-	
 	 <script>
 		window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
 		window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
@@ -70,6 +70,7 @@
 		}
 
 		function loadTable() {
+			
 			var employees = "";
 			$('.employee').remove();
 
@@ -171,33 +172,33 @@
 				}
 			};
 		}
-				function searchEmployee() {
+		function searchEmployee() {
 			var employees = "";
 			$('.employee').remove();
 
 			var objectStore = db.transaction("employee").objectStore("employee");
 			objectStore.openCursor().onsuccess = function (event) {
-				var cursor = event.target.result;
+			var cursor = event.target.result;
 				if (cursor) {
 					if(cursor.value.id == $('#search_id').val() || cursor.value.name == $('#search_id').val() || cursor.value.surname == $('#search_id').val() || cursor.value.ID_number == $('#search_id').val() || cursor.value.email == $('#search_id').val() || cursor.value.tel == $('#search_id').val() || cursor.value.adres == $('#search_id').val()){
-					employees = employees.concat(
-						'<tr class="employee2">' +
-						'<td class="ID">' + cursor.key + '</td>' +
-						'<td class="Imie">' + cursor.value.name + '</td>' +
-						'<td class="Nazwisko">' + cursor.value.surname + '</td>' +
-						'<td class="Nr_dowodu">' + cursor.value.ID_number + '</td>' +
-						'<td class="Email">' + cursor.value.email + '</td>' +
-						'<td class="Tel">' + cursor.value.tel + '</td>' +
-						'<td class="Adres">' + cursor.value.adres + '</td>' +
-						'</tr>');
-					} 
-					cursor.continue(); // wait for next event
-				
-				}else {
-					$('thead').after(employees); // no more events
-				}
-			};
-		}
+						employees = employees.concat(
+							'<tr class="employee2">' +
+							'<td class="ID2">' + cursor.key + '</td>' +
+							'<td class="Imie2">' + cursor.value.name + '</td>' +
+							'<td class="Nazwisko2">' + cursor.value.surname + '</td>' +
+							'<td class="Nr_dowodu2">' + cursor.value.ID_number + '</td>' +
+							'<td class="Email2">' + cursor.value.email + '</td>' +
+							'<td class="Tel2">' + cursor.value.tel + '</td>' +
+							'<td class="Adres2">' + cursor.value.adres + '</td>' +
+							'</tr>');
+						} 
+						cursor.continue(); // wait for next event
+					
+					}else {
+						$('thead').after(employees); // no more events
+					}
+				};
+			}
     </script>
 </body>
 </html>

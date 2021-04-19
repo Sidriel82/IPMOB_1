@@ -70,7 +70,6 @@
 		}
 
 		function loadTable() {
-			
 			var employees = "";
 			$('.employee').remove();
 
@@ -82,8 +81,8 @@
 						'<tr class="employee">' +
 						'<td class="ID">' + cursor.key + '</td>' +
 						'<td class="Imie">' + cursor.value.name + '</td>' +
-						'<td class="Nr_dowodu">' + cursor.value.ID_number + '</td>' +
-						'<td class="Nazwisko">' + cursor.value.surname + '</td>' +
+						'<td class="Nr_dowodu">' + cursor.value.surname + '</td>' +
+						'<td class="Nazwisko">' + cursor.value.ID_number + '</td>' +
 						'<td class="Email">' + cursor.value.email + '</td>' +
 						'<td class="Tel">' + cursor.value.tel + '</td>' +
 						'<td class="Adres">' + cursor.value.adres + '</td>' +
@@ -145,7 +144,13 @@
 			
 		};
 
+		function refreshPage(){
+
+		window.location.reload();
+		}
+
 		function searchEmployee() {
+				
 			var employees = "";
 			$('.employee').remove();
 
@@ -170,6 +175,7 @@
 					}else {
 						$('thead').after(employees); // no more events
 					}
+					
 				};
 			}
     </script>

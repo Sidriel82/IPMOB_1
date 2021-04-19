@@ -5,13 +5,14 @@
 <body>
 	<fieldset id="addForm">
     <legend>Add New User</legend>
-		<label for="ID">ID: </label> <input id="add_id" type="text" placeholder="01" pattern="[0-9]{1-6}"><br><br>
-		<label for="imie">Imie: </label> <input id="add_name" type="text" placeholder="Jan" pattern="[a-zA-Z]{2,64}">
-		<label for="nazwisko">Nazwisko: </label> <input id="add_surname" type="text" placeholder="Kowalski" pattern="[a-zA-Z]{2,64}"><br><br>
-		<label for="dowod">Nr. dowodu: </label> <input id="add_personal ID number" type="text" placeholder="XTR123456" pattern="[A-Z]{3}[0-9]{6}"><br><br>
+		<label for="ID">ID: </label> <input id="add_id" type="text" placeholder="1" pattern="[0-9]{1-6}"><br><br>
+		<label for="imie">Imie: </label> <input id="add_name" type="text" placeholder="Piotr" pattern="[a-zA-Z]{2,64}">
+		<label for="nazwisko">Nazwisko: </label> <input id="add_surname" type="text" placeholder="Nowak" pattern="[a-zA-Z]{2,64}"><br><br>
+		<label for="nr_dowodu">Nr. dowodu: </label> <input id="add_ID_number" type="text" placeholder="XTR123456" pattern="[A-Z]{3}[0-9]{6}"><br><br>
 		<label for="email">Email: </label> <input id="add_email" type="text" placeholder="email@wp.pl" pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"><br><br>
 		<label for="tel">Nr. Tel: </label> <input id="add_tel" type="text" placeholder="570-123-421" pattern="[0-9]{3}(-)?[0-9]{3}(-)?[0-9]{3}"><br><br>
-		<button onclick="addEmployee()">Add</button>
+		<label for="adres">Adres: </label> <input id="add_address" type="text" placeholder="11-100" pattern="[0-9]{2}-[0-9]{3}"><br><br>
+		<button onclick="addEmployee()">Add user</button>
     </fieldset>
 
     <table border=1>
@@ -19,14 +20,21 @@
             <th style="width:2em">ID</th>
             <th style="width:6em">Imie</th>
             <th style="width:6em">Nazwisko</th>
+			<th style="width:6em">Nr. dowodu</th>
             <th style="width:14em">Email</th>
 			<th style="width:2em">Tel</th>
+			<th style="width:2em">Adres</th>
+			
         </thead>
     </table>
 	</br>
 	
 	<button onclick="deleteEmployee()">Delete User</button>
-    <input id="delete_id" type="text" placeholder="ID">
+    <input id="delete_id" type="text" placeholder="ID"></br></br>
+	
+	<button onclick="searchEmployee()">Search User</button>
+    <input id="search_id" type="text" placeholder="Name">
+
 	
 	 <script>
 		window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
@@ -37,7 +45,7 @@
 			window.alert("Your browser doesn't support a stable version of IndexedDB. Such and such feature will not be available.")
 		};
 
-		const employeeData = [{id:"01", name:"Karol", surname:"Nowak", email:"example@wp.pl", tel:"123-123-123"}];
+		const employeeData = [{id:"1", name:"Piotr", surname:"Nowak", ID_number:"XTR123456", email:"example@wp.pl", tel:"123-123-123", adres:"11-100"}];
 
 		var db;
 		var request = window.indexedDB.open("newDatabase", 1);
@@ -73,9 +81,11 @@
 						'<tr class="employee">' +
 						'<td class="ID">' + cursor.key + '</td>' +
 						'<td class="Imie">' + cursor.value.name + '</td>' +
+						'<td class="Nr_dowodu">' + cursor.value.ID_number + '</td>' +
 						'<td class="Nazwisko">' + cursor.value.surname + '</td>' +
 						'<td class="Email">' + cursor.value.email + '</td>' +
 						'<td class="Tel">' + cursor.value.tel + '</td>' +
+						'<td class="Adres">' + cursor.value.adres + '</td>' +
 						'</tr>');
 					cursor.continue(); // wait for next event
 				} else {
@@ -88,14 +98,18 @@
 			var employeeID = $('#add_id').val();
 			var name = $('#add_name').val();
 			var surname = $('#add_surname').val();
+			var ID_number = $('#add_ID_number').val();
 			var email = $('#add_email').val();
 			var tel = $('#add_tel').val();
+			var adres = $('#add_address').val();
 			var request = db.transaction(["employee"], "readwrite").objectStore("employee").add({
 					id: employeeID,
 					name: name,
 					surname: surname,
+					ID_number: ID_number,
 					email: email,
 					tel: tel,
+					adres: adres,
 				});
 
 
@@ -123,8 +137,11 @@
 			$('#add_id').val("");
 			$('#add_name').val("");
 			$('#add_surname').val("");
+			$('#add_ID_number').val("");
 			$('#add_email').val("");
 			$('#add_tel').val("");
+			$('#add_address').val("");
+			
 		};
     </script>
 </body>

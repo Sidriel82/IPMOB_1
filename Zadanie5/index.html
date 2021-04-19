@@ -145,17 +145,59 @@
 		};
 		
 		function searchEmployee() {
-			var objectStore = db.transaction("employee").objectStore("employee");
-			var index = objectStore.index("name");
+			var employees = "";
+			$('.employee').remove();
 
-			index.get("Ar").onsuccess = function(event) {
-			console.log("Donna's SSN is " + event.target.result.name);
+			var objectStore = db.transaction("employee").objectStore("employee");
+			objectStore.openCursor().onsuccess = function (event) {
+				var cursor = event.target.result;
+				if (cursor) {
+					if(cursor.value.name == "Artur"){
+					employees = employees.concat(
+						'<tr class="employee">' +
+						'<td class="ID">' + cursor.key + '</td>' +
+						'<td class="Imie">' + cursor.value.name + '</td>' +
+						'<td class="Nr_dowodu">' + cursor.value.ID_number + '</td>' +
+						'<td class="Nazwisko">' + cursor.value.surname + '</td>' +
+						'<td class="Email">' + cursor.value.email + '</td>' +
+						'<td class="Tel">' + cursor.value.tel + '</td>' +
+						'<td class="Adres">' + cursor.value.adres + '</td>' +
+						'</tr>');
+					} 
+					cursor.continue(); // wait for next event
+				
+				}else {
+					$('thead').after(employees); // no more events
+				}
 			};
 		}
-		
-		
-		
-		
+				function searchEmployee() {
+			var employees = "";
+			$('.employee').remove();
+
+			var objectStore = db.transaction("employee").objectStore("employee");
+			objectStore.openCursor().onsuccess = function (event) {
+				var cursor = event.target.result;
+				if (cursor) {
+					if(cursor.value.id == $('#search_id').val() || cursor.value.name == $('#search_id').val() || cursor.value.surname == $('#search_id').val() || cursor.value.ID_number == $('#search_id').val() || cursor.value.email == $('#search_id').val() || cursor.value.tel == $('#search_id').val() || cursor.value.adres == $('#search_id').val()){
+					employees = employees.concat(
+						'<tr class="employee2">' +
+						'<td class="ID">' + cursor.key + '</td>' +
+						'<td class="Imie">' + cursor.value.name + '</td>' +
+						'<td class="Nazwisko">' + cursor.value.surname + '</td>' +
+						'<td class="Nr_dowodu">' + cursor.value.ID_number + '</td>' +
+						'<td class="Email">' + cursor.value.email + '</td>' +
+						'<td class="Tel">' + cursor.value.tel + '</td>' +
+						'<td class="Adres">' + cursor.value.adres + '</td>' +
+						'</tr>');
+					} 
+					cursor.continue(); // wait for next event
+				
+				}else {
+					$('thead').after(employees); // no more events
+				}
+			};
+		}
     </script>
 </body>
 </html>

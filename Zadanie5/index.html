@@ -15,10 +15,7 @@
 		<button onclick="addEmployee();refreshPage()">Add user</button>
     </fieldset></br>
 
-	
-	<button onclick="deleteEmployee();refreshPage()">Delete User</button>
-    <input id="delete_id" type="text" placeholder="ID"></br></br>
-	
+
 	<button onclick="searchEmployee()">Search User</button>
     <input id="search_id" type="text" placeholder="Name"></br></br>
 
@@ -32,6 +29,7 @@
             <th style="width:14em">Email</th>
 			<th style="width:6em">Tel</th>
 			<th style="width:6em">Adres</th>
+			<th style="width:6em">Delete</th>
 			
         </thead>
     </table>
@@ -86,6 +84,7 @@
 						'<td class="Email">' + cursor.value.email + '</td>' +
 						'<td class="Tel">' + cursor.value.tel + '</td>' +
 						'<td class="Adres">' + cursor.value.adres + '</td>' +
+						'<td><input type="button" style="background-color: red" onClick="deleteEmployee(\'' + cursor.key + '\')"/></td>' +
 						'</tr>');
 					cursor.continue(); // wait for next event
 				} else {
@@ -122,9 +121,8 @@
 				alert("error");
 			}
 		}
-
-		function deleteEmployee() {
-			var employeeID = $('#delete_id').val();
+		function deleteEmployee(x) {
+			var employeeID = x;
 			var request = db.transaction(["employee"], "readwrite").objectStore("employee").delete(employeeID);
 
 			request.onsuccess = function (event) {
@@ -168,6 +166,7 @@
 							'<td class="Email">' + cursor.value.email + '</td>' +
 							'<td class="Tel">' + cursor.value.tel + '</td>' +
 							'<td class="Adres">' + cursor.value.adres + '</td>' +
+							'<td><input type="button" style="background-color: red" onClick="deleteEmployee(\'' + cursor.key + '\')"/></td>' +
 							'</tr>');
 						} 
 						cursor.continue(); // wait for next event
@@ -181,7 +180,3 @@
     </script>
 </body>
 </html>
-
-
-
-

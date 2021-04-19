@@ -144,34 +144,7 @@
 			$('#add_address').val("");
 			
 		};
-		
-		function searchEmployee() {
-			var employees = "";
-			$('.employee').remove();
 
-			var objectStore = db.transaction("employee").objectStore("employee");
-			objectStore.openCursor().onsuccess = function (event) {
-				var cursor = event.target.result;
-				if (cursor) {
-					if(cursor.value.name == "Artur"){
-					employees = employees.concat(
-						'<tr class="employee">' +
-						'<td class="ID">' + cursor.key + '</td>' +
-						'<td class="Imie">' + cursor.value.name + '</td>' +
-						'<td class="Nr_dowodu">' + cursor.value.ID_number + '</td>' +
-						'<td class="Nazwisko">' + cursor.value.surname + '</td>' +
-						'<td class="Email">' + cursor.value.email + '</td>' +
-						'<td class="Tel">' + cursor.value.tel + '</td>' +
-						'<td class="Adres">' + cursor.value.adres + '</td>' +
-						'</tr>');
-					} 
-					cursor.continue(); // wait for next event
-				
-				}else {
-					$('thead').after(employees); // no more events
-				}
-			};
-		}
 		function searchEmployee() {
 			var employees = "";
 			$('.employee').remove();

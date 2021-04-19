@@ -12,11 +12,11 @@
 		<label for="email">Email: </label> <input id="add_email" type="text" placeholder="email@wp.pl" pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"><br><br>
 		<label for="tel">Nr. Tel: </label> <input id="add_tel" type="text" placeholder="570-123-421" pattern="[0-9]{3}(-)?[0-9]{3}(-)?[0-9]{3}"><br><br>
 		<label for="adres">Adres: </label> <input id="add_address" type="text" placeholder="11-100" pattern="[0-9]{2}-[0-9]{3}"><br><br>
-		<button onclick="addEmployee()">Add user</button>
+		<button onclick="addEmployee();refreshPage()">Add user</button>
     </fieldset></br>
 
 	
-	<button onclick="deleteEmployee()">Delete User</button>
+	<button onclick="deleteEmployee();refreshPage()">Delete User</button>
     <input id="delete_id" type="text" placeholder="ID"></br></br>
 	
 	<button onclick="searchEmployee()">Search User</button>
@@ -160,14 +160,14 @@
 				if (cursor) {
 					if(cursor.value.id == $('#search_id').val() || cursor.value.name == $('#search_id').val() || cursor.value.surname == $('#search_id').val() || cursor.value.ID_number == $('#search_id').val() || cursor.value.email == $('#search_id').val() || cursor.value.tel == $('#search_id').val() || cursor.value.adres == $('#search_id').val()){
 						employees = employees.concat(
-							'<tr class="employee2">' +
-							'<td class="ID2">' + cursor.key + '</td>' +
-							'<td class="Imie2">' + cursor.value.name + '</td>' +
-							'<td class="Nazwisko2">' + cursor.value.surname + '</td>' +
-							'<td class="Nr_dowodu2">' + cursor.value.ID_number + '</td>' +
-							'<td class="Email2">' + cursor.value.email + '</td>' +
-							'<td class="Tel2">' + cursor.value.tel + '</td>' +
-							'<td class="Adres2">' + cursor.value.adres + '</td>' +
+							'<tr class="employee">' +
+							'<td class="ID">' + cursor.key + '</td>' +
+							'<td class="Imie">' + cursor.value.name + '</td>' +
+							'<td class="Nr_dowodu">' + cursor.value.surname + '</td>' +
+							'<td class="Nazwisko">' + cursor.value.ID_number + '</td>' +
+							'<td class="Email">' + cursor.value.email + '</td>' +
+							'<td class="Tel">' + cursor.value.tel + '</td>' +
+							'<td class="Adres">' + cursor.value.adres + '</td>' +
 							'</tr>');
 						} 
 						cursor.continue(); // wait for next event

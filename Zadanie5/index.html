@@ -143,6 +143,19 @@
 			$('#add_address').val("");
 			
 		};
+		
+		function searchEmployee() {
+			var objectStore = db.transaction("employee").objectStore("employee");
+			var index = objectStore.index("name");
+
+			index.get("Ar").onsuccess = function(event) {
+			console.log("Donna's SSN is " + event.target.result.name);
+			};
+		}
+		
+		
+		
+		
     </script>
 </body>
 </html>

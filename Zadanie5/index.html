@@ -1,188 +1,135 @@
-<!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>IndexedDB</title>
-	<style>
-<!--CSS-->
-table, th, td {
-  border: 1px solid black;
-}
-</style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
-    <p>
-        <fieldset id="addForm">
-            <legend>Add New User</legend>
-            <label>First Name</label>
-            <input id="nameInput">
-            <label>LastName</label>
-            <input id="lastName">
-            <button id="addButton">Add</button>
-        </fieldset>
-    </p>
+	<fieldset id="addForm">
+    <legend>Add New User</legend>
+		<label for="ID">ID: </label> <input id="add_id" type="text" placeholder="01" pattern="[0-9]{1-6}"><br><br>
+		<label for="imie">Imie: </label> <input id="add_name" type="text" placeholder="Jan" pattern="[a-zA-Z]{2,64}">
+		<label for="nazwisko">Nazwisko: </label> <input id="add_surname" type="text" placeholder="Kowalski" pattern="[a-zA-Z]{2,64}"><br><br>
+		<label for="dowod">Nr. dowodu: </label> <input id="add_personal ID number" type="text" placeholder="XTR123456" pattern="[A-Z]{3}[0-9]{6}"><br><br>
+		<label for="email">Email: </label> <input id="add_email" type="text" placeholder="email@wp.pl" pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"><br><br>
+		<label for="tel">Nr. Tel: </label> <input id="add_tel" type="text" placeholder="570-123-421" pattern="[0-9]{3}(-)?[0-9]{3}(-)?[0-9]{3}"><br><br>
+		<button onclick="addEmployee()">Add</button>
+    </fieldset>
 
-    <table id="contacts" borde="1px">
+    <table border=1>
         <thead>
-            <tr><th>First Name</th><th>Last Name</th></tr>
+            <th style="width:2em">ID</th>
+            <th style="width:6em">Imie</th>
+            <th style="width:6em">Nazwisko</th>
+            <th style="width:14em">Email</th>
+			<th style="width:2em">Tel</th>
         </thead>
-        <tbody>
-        </tbody>
     </table>
+	</br>
+	
+	<button onclick="deleteEmployee()">Delete User</button>
+    <input id="delete_id" type="text" placeholder="ID">
+	
+	 <script>
+		window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+		window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
+		window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange
 
-    <script>
+		if (!window.indexedDB) {
+			window.alert("Your browser doesn't support a stable version of IndexedDB. Such and such feature will not be available.")
+		};
 
-        var indexedDB = window.indexedDB ||
-                        window.webkitIndexedDB ||
-                        window.mozIndexedDB;
+		const employeeData = [{id:"01", name:"Karol", surname:"Nowak", email:"example@wp.pl", tel:"123-123-123"}];
 
-        function DB(name) {
-            this.init = function(version, upgrade, done) {
-                console.log('init');
-                var openReq = indexedDB.open(name, version);
-                openReq.onsuccess = function(e) {
-                    var db = e.target.result;
-                    if ('setVersion' in db && db.version < version) {
-                        var setVerReq = db.setVersion(version);
-                        setVerReq.onsuccess = function(e) {
-                            console.log('upgrading');
-                            upgrade(e.target.result.db);
-                            done();
-                        };
-                    } else {
-                        done();
-                    }
-                };
-                openReq.onupgradeneeded = function(e) {
-                    console.log('upgrading');
-                    upgrade(e.target.result);
-                };
-                openReq.onerror = function(e) {
-                    console.log('init error');
-                };
-                openReq.onblocked = function(e) {
-                    console.log('init blocked');
-                };
-            };
+		var db;
+		var request = window.indexedDB.open("newDatabase", 1);
 
-            this.read = function(stores, fn, done) {
-                return this.transaction('readonly', stores, fn, done);
-            };
+		request.onerror = function (event) {
+			console.log("error: ");
+		};
 
-            this.readWrite = function(stores, fn, done) {
-                return this.transaction('readwrite', stores, fn, done);
-            };
+		request.onsuccess = function (event) {
+			db = request.result;
+			console.log("success: ", db);
+			loadTable();
+		};
 
-            this.transaction = function(mode, stores, fn, done) {
-                var openReq = indexedDB.open(name);
-                openReq.onsuccess = function(e) {
-                    var db = e.target.result;
-                    var tx = db.transaction(stores, mode);
-                    tx.oncomplete = function(e) {
-                        if (done) {
-                            done();
-                        }
-                    };
-                    tx.onabort = function(e) {
-                        console.log('tx abort');
-                    };
-                    tx.onerror = function(e) {
-                        console.log('tx error');
-                    };
-                    fn(tx);
-                };
-                openReq.onerror = function(e) {
-                    console.log('open tx error');
-                };
-            };
-        }
+		request.onupgradeneeded = function (event) {
+			var db = event.target.result;
+			var objectStore = db.createObjectStore("employee", {keyPath: "id"});
 
-        DB.deleteDatabase = function(name, done) {
-            var delReq = indexedDB.deleteDatabase(name);
-            delReq.onsuccess = function(e) {
-                done();
-            };
-            delReq.onerror = function(e) {
-                console.log('delete error');
-            };
-            delReq.onblocked = function(e) {
-                console.log('delete blocked');
-            };
-        };
-    </script>
+			for (var i in employeeData) {
+				objectStore.add(employeeData[i]);
+			}
+		}
 
-    <script>
+		function loadTable() {
+			var employees = "";
+			$('.employee').remove();
 
-        var databaseName = 'ContactsDB';
-        var contactsStoreName = 'contacts';
+			var objectStore = db.transaction("employee").objectStore("employee");
+			objectStore.openCursor().onsuccess = function (event) {
+				var cursor = event.target.result;
+				if (cursor) {
+					employees = employees.concat(
+						'<tr class="employee">' +
+						'<td class="ID">' + cursor.key + '</td>' +
+						'<td class="Imie">' + cursor.value.name + '</td>' +
+						'<td class="Nazwisko">' + cursor.value.surname + '</td>' +
+						'<td class="Email">' + cursor.value.email + '</td>' +
+						'<td class="Tel">' + cursor.value.tel + '</td>' +
+						'</tr>');
+					cursor.continue(); // wait for next event
+				} else {
+					$('thead').after(employees); // no more events
+				}
+			};
+		}
 
-        var contactsDB = new DB(databaseName);
+		function addEmployee() {
+			var employeeID = $('#add_id').val();
+			var name = $('#add_name').val();
+			var surname = $('#add_surname').val();
+			var email = $('#add_email').val();
+			var tel = $('#add_tel').val();
+			var request = db.transaction(["employee"], "readwrite").objectStore("employee").add({
+					id: employeeID,
+					name: name,
+					surname: surname,
+					email: email,
+					tel: tel,
+				});
 
-        var contacts = document.getElementById('contacts');
 
-        contactsDB.init(1, function(db) {
-            db.createObjectStore(contactsStoreName, {
-                autoIncrement: true
-            });
-        }, function() {
-            console.log('ready');
+			request.onsuccess = function (event) {
+				loadTable();
+				clearButtons();
+			};
 
-            loadContactsTable();
-        });
+			request.onerror = function (event) {
+				alert("error");
+			}
+		}
 
-        function loadContactsTable() {
-            contactsDB.read([ contactsStoreName ], function(tx) {
-                var cursor = tx.objectStore(contactsStoreName).openCursor();
-                cursor.onsuccess = function(e) {
-                    if (e.target.result) {
-                        addContactToTable(e.target.result.value);
-                        e.target.result.continue();
-                    }
-                };
-                cursor.onerror = function(e) {
-                    console.log('cursor error');
-                };
-            });
-        }
+		function deleteEmployee() {
+			var employeeID = $('#delete_id').val();
+			var request = db.transaction(["employee"], "readwrite").objectStore("employee").delete(employeeID);
 
-        function addContactToTable(contact) {
-            var newRow = contacts.insertRow(-1);
-            var nameCell = newRow.insertCell(-1);
-            nameCell.textContent = contact.name;
-            var lastNameCell = newRow.insertCell(-1);
-            lastNameCell.textContent = contact.last;
-        }
-        
-        var nameInput = document.getElementById('nameInput');
-        var lastName = document.getElementById('lastName');
+			request.onsuccess = function (event) {
+				loadTable();
+				clearButtons();
+			};
+		};
 
-        document.getElementById('addButton').onclick = function(e) {
-            e.preventDefault();
-
-            var name = nameInput.value;
-            var last = lastName.value;
-
-            console.log('adding');
-
-            contactsDB.readWrite([ contactsStoreName ], function(tx) {
-                var contact = {
-
-                    name: name,
-                    last: last
-                };
-
-                tx.objectStore(contactsStoreName).put(contact);
-
-                addContactToTable(contact);
-            }, function() {
-                console.log('added');
-
-                nameInput.value = '';
-                lastName.value = '';
-
-                nameInput.focus();
-            });
-        };
+		function clearButtons() {
+			$('#add_id').val("");
+			$('#add_name').val("");
+			$('#add_surname').val("");
+			$('#add_email').val("");
+			$('#add_tel').val("");
+		};
     </script>
 </body>
 </html>
+
+
+
+

@@ -51,35 +51,35 @@
   };
 
   document.getElementById('addClientForm').onsubmit = function(e) {
-    var bid = document.getElementById('idInput').value;
-    var bname = document.getElementById('nameInput').value;
-    var bsurname = document.getElementById('surnameInput').value;
-    var bemail = document.getElementById('emailInput').value;
-    var baddress = document.getElementById('addressInput').value;
-    var bcity = document.getElementById('cityInput').value;
-    var bpostal = document.getElementById('postalInput').value;
-    var bid_card = document.getElementById('idCardInput').value;
-    var bphone = document.getElementById('phoneInput').value;
+    var newId = document.getElementById('idInput').value;
+    var newName = document.getElementById('nameInput').value;
+    var newSurname = document.getElementById('surnameInput').value;
+    var newEmail = document.getElementById('emailInput').value;
+    var newAddress = document.getElementById('addressInput').value;
+    var newCity = document.getElementById('cityInput').value;
+    var newPostal = document.getElementById('postalInput').value;
+    var newId_card = document.getElementById('idCardInput').value;
+    var newPhone = document.getElementById('phoneInput').value;
 
-    if (!bname || !bsurname || !bemail || !baddress || !bcity || !bpostal || !bphone) {
+    if (!newName || !newSurname || !newEmail || !newAddress || !newCity || !newPostal || !newPhone) {
       window.alert("Fill the form correctly!");
       return;
     }
 
-    if (bid) {
-      bid = parseInt(bid);
+    if (newId) {
+      newId = parseInt(newId);
       const book_item = {
-        id: bid,
-        name: bname,
-        surname: bsurname,
-        email: bemail,
-        address: baddress, 
-        city: bcity, 
-        postal: bpostal,
-        id_card: bid_card,
-        phone: bphone
+        id: newId,
+        name: newName,
+        surname: newSurname,
+        email: newEmail,
+        address: newAddress, 
+        city: newCity, 
+        postal: newPostal,
+        id_card: newId_card,
+        phone: newPhone
       }
-      var id_del = bid;
+      var id_del = newId;
       var transaction = db.transaction(["clients"], "readwrite");
       var request = transaction.objectStore("clients").delete(id_del);
       var store = transaction.objectStore("clients");
@@ -90,16 +90,17 @@
       request.onerror = function(e){
         console.log('Error adding: '+e);
       };
+	  
     } else {
       const book_item = {
-        name: bname,
-        surname: bsurname,
-        email: bemail,
-        address: baddress, 
-        city: bcity, 
-        postal: bpostal,
-        id_card: bid_card,
-        phone: bphone
+        name: newName,
+        surname: newSurname,
+        email: newEmail,
+        address: newAddress, 
+        city: newCity, 
+        postal: newPostal,
+        id_card: newId_card,
+        phone: newPhone
       }
       var transaction = db.transaction(["clients"], "readwrite");
       transaction.oncomplete = function(event) {
@@ -144,17 +145,18 @@
           cursor.value.id_card.toLowerCase().includes(filter) || 
           cursor.value.phone.toLowerCase().includes(filter)
         )) {
-          document.getElementById("clients-table-body").innerHTML += "<tr><td>" + cursor.key + 
-            "</td><td>" + cursor.value.name 
-              + "</td><td>" + cursor.value.surname
-              + "</td><td>" + cursor.value.email
-              + "</td><td>" + cursor.value.address
-              + "</td><td>" + cursor.value.city 
-              + "</td><td>" + cursor.value.postal
-              + "</td><td>" + cursor.value.id_card
-              + "</td><td>" + cursor.value.phone
-              + "</td><td><button id=\"delButton\" value=\"" + cursor.key + "\">X</button>"
-              + "</td></tr>";
+          document.getElementById("clients-table-body").innerHTML += "<tr>"+
+			"<td>" + cursor.key +  "</td>" +
+			"<td>" + cursor.value.name + "</td>" +
+			"<td>" + cursor.value.surname + "</td>" +
+			"<td>" + cursor.value.email + "</td>" +
+			"<td>" + cursor.value.address + "</td>" +
+			"<td>" + cursor.value.city + "</td>" +
+			"<td>" + cursor.value.postal + "</td>" +
+			"<td>" + cursor.value.id_card + "</td>" +
+			"<td>" + cursor.value.phone + "</td>" +
+            "</td><td><button style='background-color: red' id=\"delButton\" value=\"" + cursor.id_card + "\">X</button>"
+			"</tr>";
               document.getElementById('delButton').onclick = function(e){
                 var id_del = parseInt(document.getElementById('delButton').value);
                 var request = db.transaction(["clients"], "readwrite").objectStore("clients").delete(id_del);
@@ -200,23 +202,27 @@
       cursor = event.target.result;
 
       if (cursor) {
-        document.getElementById("clients-table-body").innerHTML += "<tr><td>" + cursor.key + 
-          "</td><td>" + cursor.value.name 
-            + "</td><td>" + cursor.value.surname
-            + "</td><td>" + cursor.value.email
-            + "</td><td>" + cursor.value.address
-            + "</td><td>" + cursor.value.city 
-            + "</td><td>" + cursor.value.postal
-            + "</td><td>" + cursor.value.id_card
-            + "</td><td>" + cursor.value.phone
-            + "</td><td><button id=\"delButton\" value=\"" + cursor.key + "\">X</button>"
-            + "</td></tr>";
-            document.getElementById('delButton').onclick = function(e){
+        document.getElementById("clients-table-body").innerHTML += "<tr>"+
+			"<td>" + cursor.key +  "</td>" +
+			"<td>" + cursor.value.name + "</td>" +
+			"<td>" + cursor.value.surname + "</td>" +
+			"<td>" + cursor.value.email + "</td>" +
+			"<td>" + cursor.value.address + "</td>" +
+			"<td>" + cursor.value.city + "</td>" +
+			"<td>" + cursor.value.postal + "</td>" +
+			"<td>" + cursor.value.id_card + "</td>" +
+			"<td>" + cursor.value.phone + "</td>" +
+            "<td><button style='background-color: red' id=\"delButton\" value=\"" + cursor.id_card + "\">X</button></td>"
+			"</tr>";
+			
+			document.getElementById('delButton').onclick = function(e){
               var id_del = parseInt(document.getElementById('delButton').value);
+			  console.log()
               var request = db.transaction(["clients"], "readwrite").objectStore("clients").delete(id_del);
               document.getElementById('filterInput').value = "";
               updatetable();
            }
+
           }
           cursor.continue();
       }
@@ -238,7 +244,7 @@
 			
 			<tr>
 			<td><label>ID</label></td>
-			<td colspan="2"><input id="idInput" >(Insert the id number which you want to edit and click "Add")</td>
+			<td colspan="2"><input id="idInput" >(Insert the id number which you want edit and upgrade field below. Next click button "Add" to edit records)</td>
 			</tr>
 			<tr>
 			<td><label>Name: </label></td>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<head>
+  <title>form</title>
+  <style>
+    input:invalid {
+      border-color: rgb(197, 3, 3);
+    }
+    input:valid {
+      border-color: rgb(36, 175, 36);
+    }
+  </style>
+<script>
+  const alphabet = "abcdefghijklmnopqrstuvwxyz";
+  const bigAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+  window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction || {READ_WRITE: "readwrite"}; // This line should only be needed if it is needed to support the object's constants for older browsers
+  window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
+
+  if (!window.indexedDB) {
+    window.alert("Your browser doesn't support a stable version of IndexedDB. Such and such feature will not be available.");
+  }
+
+  function init(){
+    var request = window.indexedDB.open("ClientDatabase", 1);
+    request.onerror = function(event) {
+      alert("Error faced while opening database");
+    };
+    request.onsuccess = function(event) {
+      db = event.target.result;
+      db.onerror = function(event) {
+        alert("Database error: " + event.target.errorCode);
+      };
+      updatetable();
+  };
+
+  request.onupgradeneeded = function(event) {  
+    var db = event.target.result;
+    var objectStore = db.createObjectStore("clients", {keyPath: "id", autoIncrement: true});
+    objectStore.createIndex("name", "name", {unique: false});
+    objectStore.createIndex("surname", "surname", {unique: false});
+    objectStore.createIndex("email", "email", {unique: false});
+    objectStore.createIndex("address", "address", {unique: false});
+    objectStore.createIndex("city", "city", {unique: false});
+    objectStore.createIndex("postal", "postal", {unique: false});
+    objectStore.createIndex("id_card", "id_card", {unique: false});
+    objectStore.createIndex("phone", "phone", {unique: false});
+    objectStore.transaction.oncomplete = function(event) {
+      
+    };
+  };
+
+  document.getElementById('addClientForm').onsubmit = function(e) {
+    var bid = document.getElementById('idInput').value;
+    var bname = document.getElementById('nameInput').value;
+    var bsurname = document.getElementById('surnameInput').value;
+    var bemail = document.getElementById('emailInput').value;
+    var baddress = document.getElementById('addressInput').value;
+    var bcity = document.getElementById('cityInput').value;
+    var bpostal = document.getElementById('postalInput').value;
+    var bid_card = document.getElementById('idCardInput').value;
+    var bphone = document.getElementById('phoneInput').value;
+
+    if (!bname || !bsurname || !bemail || !baddress || !bcity || !bpostal || !bphone) {
+      window.alert("Fill the form correctly!");
+      return;
+    }
+
+    if (bid) {
+      bid = parseInt(bid);
+      const book_item = {
+        id: bid,
+        name: bname,
+        surname: bsurname,
+        email: bemail,
+        address: baddress, 
+        city: bcity, 
+        postal: bpostal,
+        id_card: bid_card,
+        phone: bphone
+      }
+      var id_del = bid;
+      var transaction = db.transaction(["clients"], "readwrite");
+      var request = transaction.objectStore("clients").delete(id_del);
+      var store = transaction.objectStore("clients");
+      var request = store.put(book_item);
+      request.onsuccess = function(e){
+        console.log("all done with transaction");
+      };
+      request.onerror = function(e){
+        console.log('Error adding: '+e);
+      };
+    } else {
+      const book_item = {
+        name: bname,
+        surname: bsurname,
+        email: bemail,
+        address: baddress, 
+        city: bcity, 
+        postal: bpostal,
+        id_card: bid_card,
+        phone: bphone
+      }
+      var transaction = db.transaction(["clients"], "readwrite");
+      transaction.oncomplete = function(event) {
+        console.log("all done with transaction");
+      };
+      transaction.onerror = function(event){
+        console.dir(event);
+      };
+      var clientsObjectStore = transaction.objectStore("clients");
+      var request = clientsObjectStore.add(book_item);
+      request.onsuccess = function(event){
+        console.log("added item");
+      };
+    }
+    updatetable();
+  }
+
+  document.getElementById('filterButton').onclick = function(e){
+    var filter = document.getElementById('filterInput').value;
+    if (!filter) {
+      filter = "";
+    }
+    filter = filter.toLowerCase();
+    
+    document.getElementById("clients-table-body").innerHTML = "";
+    var request = db.transaction("clients").objectStore("clients").openCursor();
+    request.onerror = function(event){
+      console.dir(event);
+    };
+    request.onsuccess = function(event){
+      cursor = event.target.result;
+
+      if(cursor) {
+        if 
+          ((cursor.key.toString().localeCompare(filter) == 0 ||
+          cursor.value.name.toLowerCase().includes(filter) || 
+          cursor.value.surname.toLowerCase().includes(filter) || 
+          cursor.value.email.toLowerCase().includes(filter) || 
+          cursor.value.address.toLowerCase().includes(filter) || 
+          cursor.value.city.toLowerCase().includes(filter) || 
+          cursor.value.postal.toLowerCase().includes(filter) || 
+          cursor.value.id_card.toLowerCase().includes(filter) || 
+          cursor.value.phone.toLowerCase().includes(filter)
+        )) {
+          document.getElementById("clients-table-body").innerHTML += "<tr><td>" + cursor.key + 
+            "</td><td>" + cursor.value.name 
+              + "</td><td>" + cursor.value.surname
+              + "</td><td>" + cursor.value.email
+              + "</td><td>" + cursor.value.address
+              + "</td><td>" + cursor.value.city 
+              + "</td><td>" + cursor.value.postal
+              + "</td><td>" + cursor.value.id_card
+              + "</td><td>" + cursor.value.phone
+              + "</td><td><button id=\"delButton\" value=\"" + cursor.key + "\">X</button>"
+              + "</td></tr>";
+              document.getElementById('delButton').onclick = function(e){
+                var id_del = parseInt(document.getElementById('delButton').value);
+                var request = db.transaction(["clients"], "readwrite").objectStore("clients").delete(id_del);
+                document.getElementById('filterInput').value = "";
+                updatetable();
+              }
+          }
+        cursor.continue();
+      }
+    };
+  }
+
+  function randomText(textArray) {
+    var randomIndex = Math.floor(Math.random() * textArray.length); 
+    var randomElement = textArray[randomIndex];
+    return randomElement;
+  }
+
+  function generateRandomAddress() {
+    var street = ['ul. Dolna', 'ul. Lewacka', 'ul. Warszawska', 'ul. Narutowicza', 'ul. Zielona', 'ul. '];
+    var house = Math.floor(Math.random() * 99) + 1 + alphabet[Math.floor(Math.random() * alphabet.length)] + '/' + Math.floor(Math.random() * 9) + 1; 
+    return randomText(street) + " " + house.toString();
+  }
+
+  document.getElementById('generateButton').onclick = function(e) {
+    document.getElementById("nameInput").value = randomText(['Artur', 'Alicja', 'Aleksandra', 'Krzysztof', 'Urszula', 'Maciej', 'Filip', 'Tomasz']);
+    document.getElementById("surnameInput").value = randomText(['Majewski', 'Frankowski', 'Turlakiewicz', 'Kowalski', 'Nowak', 'Mierzwa']);
+    document.getElementById("emailInput").value = Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5) + '@gmail.com';
+    document.getElementById("addressInput").value = generateRandomAddress();
+    document.getElementById("cityInput").value = randomText(['Olsztyn', 'Warszawa', 'Wrocław', 'Szczecin', 'Zgierz', 'Dobre', 'Rudza']);
+    document.getElementById("postalInput").value = (Math.floor(Math.random() * 89 + 10) + '-' + Math.floor(Math.random() * 899 + 100)).toString(); 
+    document.getElementById("phoneInput").value = Math.floor(Math.random() * 899 + 100).toString() + '-' + Math.floor(Math.random() * 899 + 100).toString() + '-' + Math.floor(Math.random() * 899 + 100).toString(); 
+    document.getElementById("idCardInput").value = bigAlphabet[Math.floor(Math.random() * bigAlphabet.length)] + bigAlphabet[Math.floor(Math.random() * bigAlphabet.length)] + bigAlphabet[Math.floor(Math.random() * bigAlphabet.length)] + Math.floor(Math.random() * 899999 + 100000).toString();
+  }
+
+  function updatetable(){
+    document.getElementById("clients-table-body").innerHTML = "";
+    var request = db.transaction("clients").objectStore("clients").openCursor();
+    request.onerror = function(event){
+      console.dir(event);
+    };
+    request.onsuccess = function(event){
+      cursor = event.target.result;
+
+      if (cursor) {
+        document.getElementById("clients-table-body").innerHTML += "<tr><td>" + cursor.key + 
+          "</td><td>" + cursor.value.name 
+            + "</td><td>" + cursor.value.surname
+            + "</td><td>" + cursor.value.email
+            + "</td><td>" + cursor.value.address
+            + "</td><td>" + cursor.value.city 
+            + "</td><td>" + cursor.value.postal
+            + "</td><td>" + cursor.value.id_card
+            + "</td><td>" + cursor.value.phone
+            + "</td><td><button id=\"delButton\" value=\"" + cursor.key + "\">X</button>"
+            + "</td></tr>";
+            document.getElementById('delButton').onclick = function(e){
+              var id_del = parseInt(document.getElementById('delButton').value);
+              var request = db.transaction(["clients"], "readwrite").objectStore("clients").delete(id_del);
+              document.getElementById('filterInput').value = "";
+              updatetable();
+           }
+          }
+          cursor.continue();
+      }
+    };
+  }
+
+</script>
+</head>
+
+<body onload="init()">
+  
+    <h1>Clients Database</h1>
+
+    <p>
+      <form id="addClientForm">
+        <fieldset id="addForm">
+			<legend>Add item</legend>
+			<table>
+			
+			<tr>
+			<td><label>ID</label></td>
+			<td colspan="2"><input id="idInput" >(Insert the id number which you want to edit and click "Add")</td>
+			</tr>
+			<tr>
+			<td><label>Name: </label></td>
+			<td><input id="nameInput" placeholder="Piotr" pattern="[a-zA-Z]{2,64}" required></td>
+			</tr>
+			
+			<tr>
+			<td><label>Surname: </label></td>
+			<td><input id="surnameInput" placeholder="Nowak" pattern="[a-zA-Z]{2,64}" required></td>
+          	</tr>
+			
+			<tr>
+			<td><label for="email">Email: </label></td>
+			<td><input id="emailInput" type="email" id="email" placeholder="email@wp.pl" pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$" required></td>
+			</tr>
+			
+			<tr>
+			<td><label for="address">Address: </label></td>
+			<td><input id="addressInput" type="text" placeholder="ul. Olsztyńska 9a/5" required></td>
+			</tr>
+			
+			<tr>
+			<td><label>City and Zip Code: </label></td>
+			<td><input id="cityInput" placeholder="Łódź" required></td>          
+			<td><input id="postalInput" type="text" placeholder="11-111" pattern="[0-9]{2}-[0-9]{3}" required></td>
+			</tr>
+			
+			<tr>
+			<td><label for="idCard">ID card number: </label></td>
+			<td><input id="idCardInput" type="text" placeholder="ABC123456" pattern="[A-Z]{3}[0-9]{6}"></td>
+			</tr>
+			
+			<tr>
+			<td><label for="phoneNumber">Phone number: </label></td>
+			<td><input id="phoneInput" type="text" placeholder="123-123-123" pattern="[0-9]{3}(-)?[0-9]{3}(-)?[0-9]{3}" required></td>
+			</tr>
+			
+			</table>
+			<button type="submit" id="addButton">Add</button>
+			<button id="generateButton">Generate Random Button</button>
+        </fieldset>
+      </form>
+    </p>
+
+    <p>
+      <fieldset id="searchForm">
+        <legend>Search</legend>
+        <label>Keyword</label>
+        <input id="filterInput">
+        <button id="filterButton">Filter</button>
+      </fieldset>
+    </p>
+
+    <table id="clients-table" border="1px">
+        <thead>
+          <tr><th>ID</th><th>Name</th><th>Surname</th><th>Email</th><th>Address</th><th>City</th><th>Zip Code</th><th>ID Card</th><th>Phone number</th></tr>
+        </thead>
+        <tbody id="clients-table-body">
+        </tbody>
+    </table>
+
+</body>
+</html>

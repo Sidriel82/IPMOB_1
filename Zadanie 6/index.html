@@ -248,7 +248,16 @@
             objectStore.openCursor().onsuccess = function (event) {
                 var cursor = event.target.result;
                 if (cursor) {
-                    if ((cursor.value.surname.toLowerCase().includes($('#search').val().toLowerCase())) {
+                    if ((cursor.value.name.toLowerCase() +
+                            cursor.value.surname.toLowerCase() +
+                            cursor.value.email.toString() +
+                            cursor.value.company.toLowerCase() +
+                            cursor.value.city.toString() +
+                            cursor.value.postal.toLowerCase() +
+                            cursor.value.address.toLowerCase() +
+                            cursor.value.phone.toLowerCase()).includes($('#search').val().toLowerCase().replace(
+                            / /g,
+                            ''))) {
                         employees = employees.concat(
                             '<tr class="employee">' +
                             '<td class="ID">' + cursor.key + '</td>' +

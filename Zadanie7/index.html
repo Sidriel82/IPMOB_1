@@ -13,8 +13,9 @@
 
             <tr>
                 <td>ID:</td>
-                <td><input id="add_id" type="text" placeholder="01" pattern="[0-9]{1-6}"><i> (to samo ID
-                        edytuje klienta)</i></td>
+                <td><input id="add_id" type="text" placeholder="1" pattern="[0-9]{1-6}">(Insert the id number which you
+                    want edit and upgrade field below. Next click button "Add/Edit"
+                    to edit records)</td>
             </tr>
             <tr>
                 <td>Name:</td>
@@ -36,7 +37,7 @@
             </tr>
             <tr>
                 <td>City and Zip Code:</td>
-                <td><input type="text" id="add_city" placeholder="ZZA423567">
+                <td><input type="text" id="add_city" placeholder="Gdańsk">
                     <input type="text" id="add_postal" placeholder="11-130" pattern="[0-9]{2}-[0-9]{3}"></td>
             </tr>
             <tr>
@@ -45,21 +46,23 @@
             </tr>
             <tr>
                 <td>Phone number:</td>
-                <td><input type="text" id="add_phone" pattern="721-423-765" pattern="[0-9]{3}(-)?[0-9]{3}(-)?[0-9]{3}"
-                        required></td>
+                <td><input type="text" id="add_phone" placeholder="721-423-765"
+                        pattern="[0-9]{3}(-)?[0-9]{3}(-)?[0-9]{3}" required></td>
             </tr>
 
             <tr>
-                <td><button onclick="addEmployee()">Wyślij</button> </td>
+                <td><button onclick="addEmployee()">Add/Edit</button> </td>
             </tr>
         </table>
     </fieldset>
     <table>
         <tr>
-            <td><button onclick="generateData()">GENERUJ LOSOWE DANE</button></td>
+            <td><button onclick="generateData()">Generate Random Data</button></td>
+            <td>To generate random data in form, press button "Random Data"</td>
         </tr>
         <tr>
             <td><button onclick="Use_Worker()">Webworker</button></td>
+            <td>To change small letter to upper and the other way, press button "Webworker"</td>
         </tr>
     </table>
     <fieldset id="addForm">
@@ -223,10 +226,10 @@
             $('#add_name').val("");
             $('#add_surname').val("");
             $('#add_email').val("");
-            $('add_company').val("");
-            $('add_city').val("");
+            $('#add_company').val("");
+            $('#add_city').val("");
             $('#add_postal').val("");
-            $('add_address').val("");
+            $('#add_address').val("");
             $('#add_phone').val("");
 
         };

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<head>
+  <title>form</title>
+  <style>
+    input:invalid {
+      border-color: rgb(197, 3, 3);
+    }
+    input:valid {
+      border-color: rgb(36, 175, 36);
+    }
+  </style>
+<script>
+  const alphabet = "abcdefghijklmnopqrstuvwxyz";
+  const bigAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+  window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction || {READ_WRITE: "readwrite"}; // This line should only be needed if it is needed to support the object's constants for older browsers
+  window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
+
+  if (!window.indexedDB) {
+    window.alert("Your browser doesn't support a stable version of IndexedDB. Such and such feature will not be available.");
+  }
+
+  function init(){
+    var request = window.indexedDB.open("ClientDatabase", 1);
+    request.onerror = function(event) {
+      alert("Error faced while opening database");
+    };
+    request.onsuccess = function(event) {
+      db = event.target.result;
+      db.onerror = function(event) {
+        alert("Database error: " + event.target.errorCode);
+      };
+      updatetable();
+  };
+
+  request.onupgradeneeded = function(event) {  
+    var db = event.target.result;
+    var objectStore = db.createObjectStore("clients", {keyPath: "id", autoIncrement: true});
+    objectStore.createIndex("name", "name", {unique: false});
+    objectStore.createIndex("surname", "surname", {unique: false});
+    objectStore.createIndex("email", "email", {unique: false});
+    objectStore.createIndex("address", "address", {unique: false});
+    objectStore.createIndex("city", "city", {unique: false});
+    objectStore.createIndex("postal", "postal", {unique: false});
+    objectStore.createIndex("nip", "nip", {unique: false});
+    objectStore.createIndex("company", "company", {unique: false});
+    objectStore.createIndex("id_card", "id_card", {unique: false});
+    objectStore.createIndex("phone", "phone", {unique: false});
+    objectStore.transaction.oncomplete = function(event) {
+      
+    };
+  };
+
+  document.getElementById('addClientForm').onsubmit = function(e) {
+    e.preventDefault();
+    var bid = document.getElementById('idInput').value;
+    var bname = document.getElementById('nameInput').value;
+    var bsurname = document.getElementById('surnameInput').value;
+    var bemail = document.getElementById('emailInput').value;
+    var baddress = document.getElementById('addressInput').value;
+    var bcity = document.getElementById('cityInput').value;
+    var bpostal = document.getElementById('postalInput').value;
+    var bnip = document.getElementById('nipInput').value;
+    var bcompany = document.getElementById('companyInput').value;
+    var bid_card = document.getElementById('idCardInput').value;
+    var bphone = document.getElementById('phoneInput').value;
+
+    if (!bname || !bsurname || !bemail || !baddress || !bcity || !bpostal || !bphone) {
+      window.alert("Fill the form correctly!");
+      return;
+    }
+
+    if (bid != "") {
+      bid = parseInt(bid);
+      var transaction = db.transaction(["clients"], "readwrite");
+      transaction.objectStore("clients").get(bid).onsuccess = function(event) {
+        var cursor = event.target.result;
+        if (cursor) {
+          const book_item = {
+            id: bid,
+            name: bname,
+            surname: bsurname,
+            email: bemail,
+            address: baddress, 
+            city: bcity, 
+            postal: bpostal,
+            nip: bnip,
+            company: bcompany,
+            id_card: bid_card,
+            phone: bphone
+          }
+          var id_del = bid;
+          var transaction = db.transaction(["clients"], "readwrite");
+          var request = transaction.objectStore("clients").delete(id_del);
+          var transaction = db.transaction(["clients"], "readwrite");
+          transaction.oncomplete = function(event) {
+            console.log("all done with transaction");
+          };
+          transaction.onerror = function(event){
+            console.dir(event);
+          };
+          var clientsObjectStore = transaction.objectStore("clients");
+          var request = clientsObjectStore.add(book_item);
+          request.onsuccess = function(event){
+            console.log("added item");
+            updatetable();
+          };
+        } else {
+          window.alert("Record with this ID doesn't exist");
+        }
+      };
+    } else {
+      const book_item = {
+        name: bname,
+        surname: bsurname,
+        email: bemail,
+        address: baddress, 
+        city: bcity, 
+        postal: bpostal,
+        nip: bnip,
+        company: bcompany,
+        id_card: bid_card,
+        phone: bphone
+      }
+      var transaction = db.transaction(["clients"], "readwrite");
+      transaction.oncomplete = function(event) {
+        console.log("all done with transaction");
+      };
+      transaction.onerror = function(event){
+        console.dir(event);
+      };
+      var clientsObjectStore = transaction.objectStore("clients");
+      var request = clientsObjectStore.add(book_item);
+      request.onsuccess = function(event){
+        console.log("added item");
+      };
+    }
+    updatetable();
+  }
+
+  document.getElementById('filterButton').onclick = function(e){
+    var filter = document.getElementById('filterInput').value;
+    if (!filter) {
+      filter = "";
+    }
+    filter = filter.toLowerCase();
+    
+    document.getElementById("clients-table-body").innerHTML = "";
+    var request = db.transaction("clients").objectStore("clients").openCursor();
+    request.onerror = function(event){
+      console.dir(event);
+    };
+    request.onsuccess = function(event){
+      cursor = event.target.result;
+
+      if(cursor) {
+        if 
+          ((cursor.key.toString().localeCompare(filter) == 0 ||
+          cursor.value.name.toLowerCase().includes(filter) || 
+          cursor.value.surname.toLowerCase().includes(filter) || 
+          cursor.value.email.toLowerCase().includes(filter) || 
+          cursor.value.address.toLowerCase().includes(filter) || 
+          cursor.value.city.toLowerCase().includes(filter) || 
+          cursor.value.postal.toLowerCase().includes(filter) || 
+          cursor.value.nip.toLowerCase().includes(filter) || 
+          cursor.value.company.toLowerCase().includes(filter) || 
+          cursor.value.id_card.toLowerCase().includes(filter) || 
+          cursor.value.phone.toLowerCase().includes(filter)
+        )) {
+          document.getElementById("clients-table-body").innerHTML += "<tr><td>" + cursor.key + 
+            "</td><td>" + cursor.value.name 
+              + "</td><td>" + cursor.value.surname
+              + "</td><td>" + cursor.value.email
+              + "</td><td>" + cursor.value.address
+              + "</td><td>" + cursor.value.city 
+              + "</td><td>" + cursor.value.postal
+              + "</td><td>" + cursor.value.nip
+              + "</td><td>" + cursor.value.company 
+              + "</td><td>" + cursor.value.id_card
+              + "</td><td>" + cursor.value.phone
+              + "</td><td><button id=\"delButton\" value=\"" + cursor.key + "\">X</button>"
+              + "</td></tr>";
+              document.getElementById('delButton').onclick = function(e){
+                var id_del = parseInt(document.getElementById('delButton').value);
+                var request = db.transaction(["clients"], "readwrite").objectStore("clients").delete(id_del);
+                document.getElementById('filterInput').value = "";
+                updatetable();
+              }
+          }
+        cursor.continue();
+      }
+    };
+  }
+
+  function randomText(textArray) {
+    var randomIndex = Math.floor(Math.random() * textArray.length); 
+    var randomElement = textArray[randomIndex];
+    return randomElement;
+  }
+
+  function generateRandomAddress() {
+    var street = ['ul. Wólczańska', 'ul. Racławicka', 'ul. Pabianicka', 'Aleja Politechniki', 'ul. Piotrkowska', 'ul. Narutowicza'];
+    var house = Math.floor(Math.random() * 99) + 1 + alphabet[Math.floor(Math.random() * alphabet.length)] + '/' + Math.floor(Math.random() * 9) + 1; 
+    return randomText(street) + " " + house.toString();
+  }
+
+  document.getElementById('generateButton').onclick = function(e) {
+    document.getElementById("nameInput").value = randomText(['Mariusz', 'Monika', 'Jan', 'Stefan', 'Ala', 'Ela', 'Ola', 'Ula', 'Marcin', 'Waldek', 'Piotr', 'Tomasz']);
+    document.getElementById("surnameInput").value = randomText(['Pudzianowski', 'Najman', 'Paździoch', 'Kowalski', 'Nowak', 'Duch', 'Jaworski', 'Drzymała', 'Welfle']);
+    document.getElementById("emailInput").value = Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5) + '@gmail.com';
+    document.getElementById("addressInput").value = generateRandomAddress();
+    document.getElementById("cityInput").value = randomText(['Łódź', 'Warszawa', 'Wrocław', 'Gdańsk', 'Pabianice', 'Gdynia', 'Poznań']);
+    document.getElementById("postalInput").value = (Math.floor(Math.random() * 89 + 10) + '-' + Math.floor(Math.random() * 899 + 100)).toString(); 
+    document.getElementById("companyInput").value = Math.random().toString(36).substring(2, 10);
+    document.getElementById("phoneInput").value = Math.floor(Math.random() * 899 + 100).toString() + '-' + Math.floor(Math.random() * 899 + 100).toString() + '-' + Math.floor(Math.random() * 899 + 100).toString(); 
+    document.getElementById("nipInput").value = Math.floor(Math.random() * 899 + 100).toString() + '-' + Math.floor(Math.random() * 899 + 100).toString() + '-' + Math.floor(Math.random() * 89 + 10).toString() + '-' + Math.floor(Math.random() * 89 + 10).toString();
+    document.getElementById("idCardInput").value = bigAlphabet[Math.floor(Math.random() * bigAlphabet.length)] + bigAlphabet[Math.floor(Math.random() * bigAlphabet.length)] + bigAlphabet[Math.floor(Math.random() * bigAlphabet.length)] + Math.floor(Math.random() * 899999 + 100000).toString();
+  }
+
+
+  function getDbObjects(filter = (object) => true) {
+    let ret = new Promise((res, rej) => {
+      let objects = [];
+      if (db) {
+        var store = db.transaction(['clients'], 'readonly').objectStore('clients');
+        store.openCursor().onsuccess = (e) => {
+          var c = e.target.result;
+          if (c) {
+            if (filter(c.value)) {
+              objects.push(c.value);
+            }
+            c.continue();
+          } else {
+            res(objects);
+          }
+        };
+      }
+    });
+    return ret;
+  }
+
+  document.getElementById('TriggerWorker').onclick = function(event) {
+    console.log("clicked!");
+    const worker = new Worker('worker.js');
+
+    var bname = document.getElementById('nameInput').value;
+    var bsurname = document.getElementById('surnameInput').value;
+    var bemail = document.getElementById('emailInput').value;
+    var baddress = document.getElementById('addressInput').value;
+    var bcity = document.getElementById('cityInput').value;
+    var bpostal = document.getElementById('postalInput').value;
+    var bnip = document.getElementById('nipInput').value;
+    var bcompany = document.getElementById('companyInput').value;
+    var bid_card = document.getElementById('idCardInput').value;
+    var bphone = document.getElementById('phoneInput').value;
+    const item = {
+      name: bname,
+      surname: bsurname,
+      email: bemail,
+      address: baddress, 
+      city: bcity, 
+      postal: bpostal,
+      nip: bnip,
+      company: bcompany,
+      id_card: bid_card,
+      phone: bphone
+    }
+    worker.postMessage(JSON.stringify(item));
+    worker.addEventListener('message', handleMessageFromWorker);
+  }
+
+  function handleMessageFromWorker(e) {
+    console.log('Message received from worker!');
+    result = JSON.parse(e.data);
+    document.getElementById("nameInput").value = result['name'];
+    document.getElementById("surnameInput").value = result['surname'];
+    document.getElementById("emailInput").value = result['email'];
+    document.getElementById("addressInput").value = result['address'];
+    document.getElementById("cityInput").value = result['city'];
+    document.getElementById("postalInput").value = result['postal'];
+    document.getElementById("companyInput").value = result['company'];
+    document.getElementById("phoneInput").value = result['phone'];
+    document.getElementById("nipInput").value = result['nip'];
+    document.getElementById("idCardInput").value = result['id_card'];
+  }
+
+  function updatetable(){
+    document.getElementById("clients-table-body").innerHTML = "";
+    var request = db.transaction("clients").objectStore("clients").openCursor();
+    request.onerror = function(event){
+      console.dir(event);
+    };
+    request.onsuccess = function(event){
+      cursor = event.target.result;
+
+      if (cursor) {
+        document.getElementById("clients-table-body").innerHTML += "<tr><td>" + cursor.key + 
+          "</td><td>" + cursor.value.name 
+            + "</td><td>" + cursor.value.surname
+            + "</td><td>" + cursor.value.email
+            + "</td><td>" + cursor.value.address
+            + "</td><td>" + cursor.value.city 
+            + "</td><td>" + cursor.value.postal
+            + "</td><td>" + cursor.value.nip
+            + "</td><td>" + cursor.value.company 
+            + "</td><td>" + cursor.value.id_card
+            + "</td><td>" + cursor.value.phone
+            + "</td><td><button id=\"delButton\" value=\"" + cursor.key + "\">X</button>"
+            + "</td></tr>";
+            document.getElementById('delButton').onclick = function(e){
+              var id_del = parseInt(document.getElementById('delButton').value);
+              var request = db.transaction(["clients"], "readwrite").objectStore("clients").delete(id_del);
+              document.getElementById('filterInput').value = "";
+              updatetable();
+           }
+          }
+          cursor.continue();
+      }
+    };
+  }
+
+</script>
+</head>
+
+<body onload="init()">
+  
+    <h1>Clients Database</h1>
+    Please, reset you database in your browser, because database structure has changed since last laboratories<br>
+    To use webworker, please, generate random data first or fill the form manually<br>
+
+    <p>
+      <form id="addClientForm">
+        <fieldset id="addForm">
+          <legend>Add item</legend>
+
+          <label>ID</label>
+          <input id="idInput"><br>
+          <small>(Fill up to edit an existing record)</small><br><br>
+
+          <label>Name *</label>
+          <input id="nameInput" placeholder="Jan" required><br><br>
+
+          <label>Surname *</label>
+          <input id="surnameInput" placeholder="Kowalski" required><br><br>
+          
+          <label for="email">Email *</label>
+          <input required id="emailInput" type="email" id="email" name="email" placeholder="jareczek@example.com"><br><br>
+          
+          <label for="address">Address *</label>
+          <input required type="text" id="addressInput" placeholder="ul. Żeromskiego 12a/33"><br><br>
+
+          <label>City *</label>
+          <input id="cityInput" placeholder="Łódź" required><br><br>            
+
+          <label for="postalCode">Zip Code *</label>
+          <input required type="text" id="postalInput" name="postal_code" placeholder="92-701" pattern="\d{2}-\d{3}" title="Format: (NN-NNN)"><br><br>
+          
+          <label for="nipNumber">NIP number </label>
+          <input type="text" id="nipInput" name="nip_number" placeholder="123-456-32-18" pattern="((\d{3}[- ]\d{3}[- ]\d{2}[- ]\d{2})|(\d{3}[- ]\d{2}[- ]\d{2}[- ]\d{3}))" title="Polish NIP format"><br><br>
+    
+          <label for="companyName">Company name </label>
+          <input id="companyInput" placeholder="kis"><br><br>
+
+          <label for="idCard">ID card number </label>
+          <input type="text" id="idCardInput" name="id_card" placeholder="ABC123456" pattern="[A-Z]{3}[0-9]{6}" title="Correct ID card number contains 3 numbers and 6 digits"><br><br>
+
+          <label for="phoneNumber">Phone number *</label>
+          <input required type="text" id="phoneInput" placeholder="123-123-123" name="phone_number" pattern="[0-9]{3}(-)?[0-9]{3}(-)?[0-9]{3}" title="NNN-NNN-NNN or NNNNNNNNN format"><br><br>
+          <button type="submit" id="addButton">Add</button>
+        </fieldset>
+      </form>
+      <button id="generateButton">Generate Random Data</button><br>
+      <button id="TriggerWorker">Run Webworker</button>
+    </p>
+
+    <p>
+      <fieldset id="searchForm">
+        <legend>Search</legend>
+        <label>Keyword</label>
+        <input id="filterInput">
+        <button id="filterButton">Filter</button>
+      </fieldset>
+    </p>
+
+    <table id="clients-table">
+        <thead>
+          <tr><th>ID</th><th>Name</th><th>Surname</th><th>Email</th><th>Address</th><th>City</th><th>Zip Code</th><th>NIP</th><th>Company</th><th>ID Card</th><th>Phone number</th></tr>
+        </thead>
+        <tbody id="clients-table-body">
+        </tbody>
+    </table>
+
+</body>
+</html>

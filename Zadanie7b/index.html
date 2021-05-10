@@ -14,6 +14,25 @@
         .titleTable th {
             background-color: #ddd;
         }
+
+        #RGBfilter {
+            display: block;
+            z-index: 2;
+            width: 250px;
+            height: 150px;
+            /* background-color: rgba(50, 100, 150, 1); */
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+
+        #edit_img {
+            display: block;
+            z-index: 1;
+            width: 250px;
+            height: 150px;
+            /* background-color: rgba(255, 0, 0, 0.5); */
+            background-repeat: no-repeat;
+        }
     </style>
 </head>
 
@@ -24,7 +43,7 @@
 
             <tr>
                 <td>ID:</td>
-                <td><input id="add_id" type="text" placeholder="1" pattern="[0-9]{1-6}" required>(Insert the id number
+                <td><input id="add_id" type="text" placeholder="1" required>(Insert the id number
                     which you
                     want edit and upgrade field below. Next click button "Add/Edit"
                     to edit records)</td>
@@ -70,7 +89,9 @@
             <tr>
                 <td><button onclick="addEmployee()">Add/Edit</button> </td>
 
-                <td><img alt="IMG" src="" id="edit_img" width=150" height="70"></td>
+                <td>
+                    <div id="RGBfilter"><img src="" id="edit_img"></div>
+                </td>
             </tr>
         </table>
     </fieldset>
@@ -391,11 +412,7 @@
             document.getElementById("add_phone").value = data_fromWorker['phone'];
         }
 
-        function Img_Worker() {
-            console.log("clicked!");
-            const worker2 = new Worker('./worker2.js');
-            console.log("clicked!");
-
+        function getFormContent() {
             var temp_name = document.getElementById("add_name").value;
             var temp_surname = document.getElementById("add_surname").value;
             var temp_email = document.getElementById("add_email").value;
@@ -404,38 +421,46 @@
             var temp_postal = document.getElementById("add_postal").value;
             var temp_address = document.getElementById("add_address").value;
             var temp_phone = document.getElementById("add_phone").value;
-
-            var locatString =
-                (temp_name +
-                    temp_surname +
-                    temp_email +
-                    temp_company +
-                    temp_city +
-                    temp_postal +
-                    temp_address +
-                    temp_phone
-                ).replace(/ /g, '');
-
-            worker2.postMessage(JSON.stringify(locatString));
-
-            worker2.addEventListener('message', MessageFromWorkerImg);
+            var temp_img = document.getElementById("add_img").value;
+            const item = {
+                name: temp_name,
+                surname: temp_surname,
+                email: temp_email,
+                company: temp_company,
+                city: temp_city,
+                postal: temp_postal,
+                address: temp_address,
+                phone: temp_phone,
+                image: temp_img,
+            }
+            return item;
         }
 
-        function MessageFromWorkerImg(e) {
-            // data_fromWorker = JSON.parse(e.data);
-            data_fromWorker = e.data;
-            console.log(data_fromWorker);
-            // console.log(data_fromWorker['name']);
-            // console.log(data_fromWorker['surname']);
-            // console.log(data_fromWorker['email']);
-            // console.log(data_fromWorker['company']);
-            // console.log(data_fromWorker['city']);
-            // console.log(data_fromWorker['postal']);
-            // console.log(data_fromWorker['address']);
-            // console.log(data_fromWorker['phone']);
+        function Img_Worker() {
+            if (document.getElementById("add_img").value.length < 1) {
+                window.alert("Image cannot be blank!");
+                return;
+            }
+            const item = getFormContent();
+            const worker = new Worker('worker2.js');
+            worker.postMessage(JSON.stringify(item));
+            worker.addEventListener('message', handleMessageFromFilterWorker);
 
+        }
 
+        function handleMessageFromFilterWorker(e) {
+            result = JSON.parse(e.data);
+            var image = document.getElementById('add_img').value;
+            const SelectR = parseInt(result['R']);
+            const SelectG = parseInt(result['G']);
+            const SelectB = parseInt(result['B']);
 
+            // document.querySelector('#edit_img').style.zIndex = "1";
+            // document.querySelector('#edit_img').src = $('#add_img').val();
+            // document.querySelector('#edit_img')
+            document.querySelector('#RGBfilter').style.backgroundImage = 'url(' + image + ')';
+            document.querySelector('#edit_img').style.backgroundColor = 'rgba(' + SelectR + ',' + SelectG + ',' +
+                SelectB + ', 0.5)';
         }
 
         function refresh() {

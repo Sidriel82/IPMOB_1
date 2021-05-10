@@ -1,0 +1,447 @@
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        input:invalid {
+            border-color: rgb(197, 3, 3);
+        }
+
+        input:valid {
+            border-color: rgb(36, 175, 36);
+        }
+
+        .titleTable th {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+
+<body style="margin: 20 px auto;">
+    <fieldset id="addForm">
+        <legend>Add Client</legend>
+        <table>
+
+            <tr>
+                <td>ID:</td>
+                <td><input id="add_id" type="text" placeholder="1" pattern="[0-9]{1-6}" required>(Insert the id number
+                    which you
+                    want edit and upgrade field below. Next click button "Add/Edit"
+                    to edit records)</td>
+            </tr>
+            <tr>
+                <td>Name:</td>
+                <td><input id="add_name" type="text" placeholder="Jan" pattern="[a-zA-Z]{2,64}" required></td>
+            </tr>
+
+            <tr>
+                <td>Surname:</td>
+                <td><input id="add_surname" type="text" placeholder="Kowalski" pattern="[a-zA-Z]{2,64}" required></td>
+            </tr>
+            <tr>
+                <td>Email:</td>
+                <td><input id="add_email" type="text" placeholder="email@wp.pl"
+                        pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$" required></td>
+            </tr>
+            <tr>
+                <td>Company:</td>
+                <td><input id="add_company" type="text" placeholder="Exbud" required></td>
+            </tr>
+            <tr>
+                <td>City and Zip Code:</td>
+                <td><input type="text" id="add_city" placeholder="Gdańsk" required>
+                    <input type="text" id="add_postal" placeholder="11-130" pattern="[0-9]{2}-[0-9]{3}" required></td>
+            </tr>
+            <tr>
+                <td>Address:</td>
+                <td><input type="text" id="add_address" placeholder="ul. Różana 6a/9" required></td>
+            </tr>
+            <tr>
+                <td>Phone number:</td>
+                <td><input type="text" id="add_phone" placeholder="721-423-765"
+                        pattern="[0-9]{3}(-)?[0-9]{3}(-)?[0-9]{3}" required></td>
+            </tr>
+
+            <tr>
+                <td>Img link:</td>
+                <td><input type="text" id="add_img" placeholder="https://www.qries.com/images/banner_logo.png"></td>
+            </tr>
+
+            <tr>
+                <td><button onclick="addEmployee()">Add/Edit</button> </td>
+
+                <td><img alt="IMG" src="" id="edit_img" width=150" height="70"></td>
+            </tr>
+        </table>
+    </fieldset>
+    <table>
+        <tr>
+            <td><button onclick="generateData()">Generate Random Data</button></td>
+            <td>To generate random data in form, press button "Random Data"</td>
+        </tr>
+        <tr>
+            <td><button onclick="Use_Worker()">Webworker</button></td>
+            <td>To change small letter to upper and the other way, press button "Webworker"</td>
+        </tr>
+        <tr>
+            <td><button onclick="Img_Worker()">Webworker</button></td>
+            <td>To change small letter to upper and the other way, press button "Webworker"</td>
+        </tr>
+    </table>
+    <fieldset id="addForm">
+        <legend>Serch</legend>
+        <input type="text" id="search" placeholder="Wyszukaj tekst w tabeli"></input>
+        <button onclick="searchtable()">Search</button>
+        <button onclick="refresh()">Refresh</button>
+    </fieldset>
+    <fieldset id="addForm">
+        <legend>Results</legend>
+        <table border=1 id="tabela" class="titleTable">
+            <thead>
+                <th style="width:2em">ID</th>
+                <th style="width:6em">Name</th>
+                <th style="width:6em">Surname</th>
+                <th style="width:3em">Email</th>
+                <th style="width:10em">Company name</th>
+                <th style="width:8em">City</th>
+                <th style="width:6em">Zip Code</th>
+                <th style="width:16em">Address</th>
+                <th style="width:6em">Phone number</th>
+            </thead>
+        </table>
+    </fieldset>
+    <script>
+        //prefixes of implementation that we want to test
+        window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+
+        //prefixes of window.IDB objects
+        window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
+        window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
+
+        if (!window.indexedDB) {
+            window.alert("Brak wsparcia IndexedDB na twoja przegladarke.")
+        };
+
+        const employeeData = [{
+            id: parseInt("1"),
+            name: "Jan",
+            surname: "Kowalski",
+            email: "example@wp.pl",
+            company: "Exbud",
+            city: "Olsztyn",
+            postal: "11-130",
+            address: "ul. Różana 6a/9",
+            phone: "721-721-721",
+        }];
+
+        var db;
+        var request = window.indexedDB.open("newDatabase", 1);
+
+        request.onerror = function (event) {
+            console.log("error: ");
+        };
+
+        request.onsuccess = function (event) {
+            db = request.result;
+            console.log("success: ", db);
+            loadTable();
+        };
+
+        request.onupgradeneeded = function (event) {
+            var db = event.target.result;
+            var objectStore = db.createObjectStore("employee", {
+                keyPath: "id"
+            });
+            for (var i in employeeData) {
+                objectStore.add(employeeData[i]);
+            }
+        }
+
+        function loadTable() {
+            var employees = "";
+            $('.employee').remove();
+
+            var objectStore = db.transaction("employee").objectStore("employee");
+            objectStore.openCursor().onsuccess = function (event) {
+                var cursor = event.target.result;
+                if (cursor) {
+                    employees = employees.concat(
+                        '<tr class="employee">' +
+                        '<td class="ID">' + cursor.key + '</td>' +
+                        '<td class="Imie">' + cursor.value.name + '</td>' +
+                        '<td class="Nazwisko">' + cursor.value.surname + '</td>' +
+                        '<td class="Email">' + cursor.value.email + '</td>' +
+                        '<td class="CompanyName">' + cursor.value.company + '</td>' +
+                        '<td class="CityName">' + cursor.value.city + '</td>' +
+                        '<td class="PostalNumber">' + cursor.value.postal + '</td>' +
+                        '<td class="AddressCity">' + cursor.value.address + '</td>' +
+                        '<td class="PhoneNumber">' + cursor.value.phone + '</td>' +
+                        '<td><button style="background-color:red;" onClick="deleteEmployee(\'' + cursor.key +
+                        '\')">X</button>' +
+                        '</tr>');
+
+                } else {
+                    $('thead').after(employees); // no more events
+                }
+                cursor.continue();
+            };
+        }
+
+        function addEmployee() {
+            var employeeID = parseInt($('#add_id').val());
+            var name = $('#add_name').val();
+            var surname = $('#add_surname').val();
+            var email = $('#add_email').val();
+            var company = $('#add_company').val();
+            var city = $('#add_city').val();
+            var postal = $('#add_postal').val();
+            var address = $('#add_address').val();
+            var phone = $('#add_phone').val();
+            var image = $('#add_img').val();
+
+            document.querySelector("#edit_img").src = image;
+
+            var request = db.transaction(["employee"], "readwrite")
+                .objectStore("employee")
+                .add({
+                    id: employeeID,
+                    name: name,
+                    surname: surname,
+                    email: email,
+                    company: company,
+                    city: city,
+                    postal: postal,
+                    address: address,
+                    phone: phone,
+                });
+            request.onsuccess = function (event) {
+                loadTable();
+                clearButtons();
+            };
+
+            request.onerror = function (event) {
+                var request = db.transaction(["employee"], "readwrite").objectStore("employee").delete(employeeID)
+                var request = db.transaction(["employee"], "readwrite")
+                    .objectStore("employee")
+                    .add({
+                        id: employeeID,
+                        name: name,
+                        surname: surname,
+                        email: email,
+                        company: company,
+                        city: city,
+                        postal: postal,
+                        address: address,
+                        phone: phone,
+                    });
+                loadTable();
+                clearButtons();
+            }
+        }
+
+        function deleteEmployee(x) {
+            var employeeID = parseInt(x);
+            var request = db.transaction(["employee"], "readwrite")
+                .objectStore("employee")
+                .delete(employeeID);
+
+            request.onsuccess = function (event) {
+                loadTable();
+                clearButtons();
+            };
+        };
+
+        function clearButtons() {
+            $('#add_id').val("");
+            $('#add_name').val("");
+            $('#add_surname').val("");
+            $('#add_email').val("");
+            $('#add_company').val("");
+            $('#add_city').val("");
+            $('#add_postal').val("");
+            $('#add_address').val("");
+            $('#add_phone').val("");
+
+        };
+
+        function searchtable() {
+            var employees = "";
+            $('.employee').remove();
+            var objectStore = db.transaction("employee").objectStore("employee");
+            objectStore.openCursor().onsuccess = function (event) {
+                var cursor = event.target.result;
+                if (cursor) {
+                    if ((cursor.value.name.toLowerCase() +
+                            cursor.value.surname.toLowerCase() +
+                            cursor.value.email.toString() +
+                            cursor.value.company.toLowerCase() +
+                            cursor.value.city.toString() +
+                            cursor.value.postal.toLowerCase() +
+                            cursor.value.address.toLowerCase() +
+                            cursor.value.phone.toLowerCase()).includes($('#search').val().toLowerCase().replace(
+                            / /g,
+                            ''))) {
+                        employees = employees.concat(
+                            '<tr class="employee">' +
+                            '<td class="ID">' + cursor.key + '</td>' +
+                            '<td class="Imie">' + cursor.value.name + '</td>' +
+                            '<td class="Nazwisko">' + cursor.value.surname + '</td>' +
+                            '<td class="Email">' + cursor.value.email + '</td>' +
+                            '<td class="CompanyName">' + cursor.value.company + '</td>' +
+                            '<td class="CityName">' + cursor.value.city + '</td>' +
+                            '<td class="PostalNumber">' + cursor.value.postal + '</td>' +
+                            '<td class="AddressCity">' + cursor.value.address + '</td>' +
+                            '<td class="PhoneNumber">' + cursor.value.phone + '</td>' +
+                            '<td><button style="background-color:red;" onClick="deleteEmployee(\'' + cursor
+                            .key + '\')">X</button>' +
+                            '</tr>');
+                    }
+                } else {
+                    $('thead').after(employees); // no more events
+                }
+                cursor.continue();
+            };
+        }
+        const alphabet = "abcdefghijklmnopqrstuvwxyz";
+        const bigAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        function randomText(textArray) {
+            var randomIndex = Math.floor(Math.random() * textArray.length);
+            var randomElement = textArray[randomIndex];
+            return randomElement;
+        }
+
+        function generateRandomAddress() {
+            var street = ['ul. Olsztyńska', 'ul. Zamkowa', 'ul. Klasztorna', 'ul. Kosucińskiego', 'ul. Piotrkowska',
+                'ul. 1-go Maja'
+            ];
+            var house = Math.floor(Math.random() * 99) + 1 + alphabet[Math.floor(Math.random() * alphabet.length)] +
+                '/' + Math.floor(Math.random() * 9) + 1;
+            return randomText(street) + " " + house.toString();
+        }
+
+        function generateData() {
+            var IDnumber = parseInt(document.querySelector(".employee:nth-last-child(1) td").innerHTML);
+            IDnumber += 1;
+            document.getElementById("add_id").value = IDnumber
+            document.getElementById("add_name").value = randomText(["Jan", "Tomasz", "Maciej", "Marcin", "Andrzej",
+                "Adam", "Robert", "Jakub", "Kamil", "Dominik"
+            ]);
+            document.getElementById("add_surname").value = randomText(["Ryba", "Lok", "Papa", "Corleone", "Stalone",
+                "Torino", "Polanski", "Psikut", "Nowak", "Kowalski"
+            ]);
+            document.getElementById("add_email").value = Math.random().toString(36).substring(2, 5) + Math.random()
+                .toString(36).substring(2, 5) + '@gmail.com';
+            document.getElementById("add_company").value = randomText(['Mrówka', 'Żabka', 'Biedronka', 'Lidl',
+                'Auchan',
+                'Dino', 'BP', 'Lewiatan'
+            ]);
+            document.getElementById("add_city").value = randomText(['Olsztyn', 'Dobre Miasto', 'Wrocław', 'Zgierz',
+                'Pabianice', 'Gdynia', 'Sopot'
+            ]);
+            document.getElementById("add_postal").value = Math.floor((Math.random() * 89) + 10).toString() + '-' +
+                Math
+                .floor((Math.random() * 899) + 100).toString();
+            document.getElementById("add_address").value = generateRandomAddress();
+            document.getElementById("add_phone").value = Math.floor(Math.random() * 899 + 100).toString() + '-' +
+                Math
+                .floor(Math.random() * 899 + 100).toString() + '-' + Math.floor(Math.random() * 899 + 100)
+                .toString();
+
+        }
+
+        function Use_Worker() {
+            console.log("clicked!");
+            const worker = new Worker('./worker.js');
+            console.log("clicked!");
+
+            var temp_name = document.getElementById("add_name").value;
+            var temp_surname = document.getElementById("add_surname").value;
+            var temp_email = document.getElementById("add_email").value;
+            var temp_company = document.getElementById("add_company").value;
+            var temp_city = document.getElementById("add_city").value;
+            var temp_postal = document.getElementById("add_postal").value;
+            var temp_address = document.getElementById("add_address").value;
+            var temp_phone = document.getElementById("add_phone").value;
+
+
+            const data_toWorker = {
+                name: temp_name,
+                surname: temp_surname,
+                email: temp_email,
+                company: temp_company,
+                city: temp_city,
+                postal: temp_postal,
+                address: temp_address,
+                phone: temp_phone,
+            }
+            worker.postMessage(JSON.stringify(data_toWorker));
+            worker.addEventListener('message', MessageFromWorker);
+        }
+
+        function MessageFromWorker(e) {
+            data_fromWorker = JSON.parse(e.data);
+            document.getElementById("add_name").value = data_fromWorker['name'];
+            document.getElementById("add_surname").value = data_fromWorker['surname'];
+            document.getElementById("add_email").value = data_fromWorker['email'];
+            document.getElementById("add_company").value = data_fromWorker['company'];
+            document.getElementById("add_city").value = data_fromWorker['city'];
+            document.getElementById("add_postal").value = data_fromWorker['postal'];
+            document.getElementById("add_address").value = data_fromWorker['address'];
+            document.getElementById("add_phone").value = data_fromWorker['phone'];
+        }
+
+        function Img_Worker() {
+            console.log("clicked!");
+            const worker2 = new Worker('./worker2.js');
+            console.log("clicked!");
+
+            var temp_name = document.getElementById("add_name").value;
+            var temp_surname = document.getElementById("add_surname").value;
+            var temp_email = document.getElementById("add_email").value;
+            var temp_company = document.getElementById("add_company").value;
+            var temp_city = document.getElementById("add_city").value;
+            var temp_postal = document.getElementById("add_postal").value;
+            var temp_address = document.getElementById("add_address").value;
+            var temp_phone = document.getElementById("add_phone").value;
+
+            var locatString =
+                (temp_name +
+                    temp_surname +
+                    temp_email +
+                    temp_company +
+                    temp_city +
+                    temp_postal +
+                    temp_address +
+                    temp_phone
+                ).replace(/ /g, '');
+
+            worker2.postMessage(JSON.stringify(locatString));
+
+            worker2.addEventListener('message', MessageFromWorkerImg);
+        }
+
+        function MessageFromWorkerImg(e) {
+            // data_fromWorker = JSON.parse(e.data);
+            data_fromWorker = e.data;
+            console.log(data_fromWorker);
+            // console.log(data_fromWorker['name']);
+            // console.log(data_fromWorker['surname']);
+            // console.log(data_fromWorker['email']);
+            // console.log(data_fromWorker['company']);
+            // console.log(data_fromWorker['city']);
+            // console.log(data_fromWorker['postal']);
+            // console.log(data_fromWorker['address']);
+            // console.log(data_fromWorker['phone']);
+
+
+
+        }
+
+        function refresh() {
+            loadTable();
+        }
+    </script>
+</body>
+
+</html>

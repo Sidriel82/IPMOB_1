@@ -33,6 +33,10 @@
             /* background-color: rgba(255, 0, 0, 0.5); */
             background-repeat: no-repeat;
         }
+        canvas {
+            width: 100px;
+            height: 100px;
+        }
     </style>
 </head>
 
@@ -90,7 +94,8 @@
                 <td><button onclick="addEmployee()">Add/Edit</button> </td>
 
                 <td>
-                    <div id="RGBfilter"><img src="" id="edit_img"></div>
+                    <!-- <div id="RGBfilter"><img src="" id="edit_img"></div> -->
+                    <div id="RGBfilter"><canvas id="canvas"></canvas></canvas></div>
                 </td>
             </tr>
         </table>

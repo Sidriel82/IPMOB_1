@@ -38,6 +38,9 @@
             height: 100px;
             z-index: 2;
         }
+        #instr{
+            max-width: 200px;
+        }
     </style>
 </head>
 
@@ -48,8 +51,8 @@
 
             <tr>
                 <td>ID:</td>
-                <td><input id="add_id" type="text" placeholder="1" required>(Insert the id number which you want edit and upgrade field below. Next click button "Add/Edit"
-                    to edit records)</td>
+                <td><input id="add_id" type="text" placeholder="1" required><div id="instr">(Insert the id number which you want edit and upgrade field below. Next click button "Add/Edit"
+                    to edit records)</div></td>
             </tr>
             <tr>
                 <td>Name:</td>
@@ -95,6 +98,8 @@
                 <td>
                     <!-- <div id="RGBfilter"><img src="" id="edit_img"></div> -->
                     <div id="RGBfilter"><canvas id="canvas"></canvas></canvas></div>
+                    <td><div id="instr">If you want add picture to database, first paste URL link with photo to the fild "Img link", next press the button "Webworker IMG" and after press button the "Add/Edit".</div></td>
+
                 </td>
             </tr>
         </table>

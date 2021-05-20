@@ -36,6 +36,7 @@
         canvas {
             width: 100px;
             height: 100px;
+            z-index: 2;
         }
     </style>
 </head>
@@ -47,9 +48,7 @@
 
             <tr>
                 <td>ID:</td>
-                <td><input id="add_id" type="text" placeholder="1" required>(Insert the id number
-                    which you
-                    want edit and upgrade field below. Next click button "Add/Edit"
+                <td><input id="add_id" type="text" placeholder="1" required>(Insert the id number which you want edit and upgrade field below. Next click button "Add/Edit"
                     to edit records)</td>
             </tr>
             <tr>
@@ -293,7 +292,7 @@
             $('#add_postal').val("");
             $('#add_address').val("");
             $('#add_phone').val("");
-
+            // $('#add_img').val("");
         };
 
         function searchtable() {
@@ -380,7 +379,7 @@
             var temp_postal = document.getElementById("add_postal").value;
             var temp_address = document.getElementById("add_address").value;
             var temp_phone = document.getElementById("add_phone").value;
-
+            
 
             const data_toWorker = {
                 name: temp_name,

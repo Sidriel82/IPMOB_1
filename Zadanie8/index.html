@@ -226,9 +226,9 @@
             var address = $('#add_address').val();
             var phone = $('#add_phone').val();
             var image = $('#add_img').val();
-
-            document.querySelector("#edit_img").src = image;
-
+            var picture = document.querySelector('#canvas').toDataURL('image/jpeg', 1.0);
+            // console.log(picture);
+            
             var request = db.transaction(["employee"], "readwrite")
                 .objectStore("employee")
                 .add({
@@ -241,6 +241,8 @@
                     postal: postal,
                     address: address,
                     phone: phone,
+                    image: image,
+                    picture: picture,
                 });
             request.onsuccess = function (event) {
                 loadTable();

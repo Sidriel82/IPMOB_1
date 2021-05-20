@@ -204,10 +204,10 @@
                         '<td class="PostalNumber">' + cursor.value.postal + '</td>' +
                         '<td class="AddressCity">' + cursor.value.address + '</td>' +
                         '<td class="PhoneNumber">' + cursor.value.phone + '</td>' +
-                        '<td><button style="background-color:red;" onClick="deleteEmployee(\'' + cursor.key +
-                        '\')">X</button>' +
+                        '<td class="ImageURL">' + cursor.value.image + '</td>' +
+                        '<td class="PictureMin"> <img src="' + cursor.value.picture + '" width="100" height="100"> </td>' +
+                        '<td><button style="background-color:red;" onClick="deleteEmployee(\'' + cursor.key +'\')">X</button>' +
                         '</tr>');
-
                 } else {
                     $('thead').after(employees); // no more events
                 }
@@ -263,6 +263,8 @@
                         postal: postal,
                         address: address,
                         phone: phone,
+                        image: image,
+                        picture: picture,
                     });
                 loadTable();
                 clearButtons();
@@ -322,8 +324,9 @@
                             '<td class="PostalNumber">' + cursor.value.postal + '</td>' +
                             '<td class="AddressCity">' + cursor.value.address + '</td>' +
                             '<td class="PhoneNumber">' + cursor.value.phone + '</td>' +
-                            '<td><button style="background-color:red;" onClick="deleteEmployee(\'' + cursor
-                            .key + '\')">X</button>' +
+                            '<td class="ImageURL">' + cursor.value.image + '</td>' +
+                            '<td class="PictureMin"> <img src="' + cursor.value.picture + '" width="100" height="100"> </td>' +
+                            '<td><button style="background-color:red;" onClick="deleteEmployee(\'' + cursor.key + '\')">X</button>' +
                             '</tr>');
                     }
                 } else {

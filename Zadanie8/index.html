@@ -418,6 +418,7 @@
             var temp_address = document.getElementById("add_address").value;
             var temp_phone = document.getElementById("add_phone").value;
             var temp_img = document.getElementById("add_img").value;
+
             const item = {
                 name: temp_name,
                 surname: temp_surname,
@@ -441,22 +442,26 @@
             const worker = new Worker('worker2.js');
             worker.postMessage(JSON.stringify(item));
             worker.addEventListener('message', handleMessageFromFilterWorker);
-
         }
 
         function handleMessageFromFilterWorker(e) {
             result = JSON.parse(e.data);
-            var image = document.getElementById('add_img').value;
+            var imageURL = document.getElementById('add_img').value;
             const SelectR = parseInt(result['R']);
             const SelectG = parseInt(result['G']);
             const SelectB = parseInt(result['B']);
 
-            // document.querySelector('#edit_img').style.zIndex = "1";
-            // document.querySelector('#edit_img').src = $('#add_img').val();
-            // document.querySelector('#edit_img')
-            document.querySelector('#RGBfilter').style.backgroundImage = 'url(' + image + ')';
-            document.querySelector('#edit_img').style.backgroundColor = 'rgba(' + SelectR + ',' + SelectG + ',' +
-                SelectB + ', 0.5)';
+            
+            var canvas = document.querySelector('canvas');
+            var ctx = canvas.getContext('2d');
+            var image = new Image;
+            image.crossOrigin = "anonymous";
+            image.onload = function() {
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(' + SelectR + ',' + SelectG + ',' + SelectB + ', 0.5)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } ;
+            image.src = imageURL;
         }
 
         function refresh() {

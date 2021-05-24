@@ -14,6 +14,10 @@
         .titleTable th {
             background-color: #ddd;
         }
+        .tableFilds{
+            display: block;
+            width: 50px;
+        }
     </style>
 </head>
 
@@ -23,9 +27,8 @@
         <table>
 
             <tr>
-                <td>ID:</td>
-                <td><input id="add_id" type="text" placeholder="1" required><div id="instr">(Insert the id number which you want edit and upgrade field below. Next click button "Add/Edit"
-                    to edit records)</div></td>
+                <td hidden>ID:</td>
+                <td><input id="add_id" type="text" placeholder="1" required hidden><div id="instr"></div></td>
             </tr>
             <tr>
                 <td>Name:</td>
@@ -68,7 +71,7 @@
     <table>
         <tr>
             <td><button onclick="generateData()">Generate Random Data</button></td>
-            <td>To generate random data in form, press button "Random Data"</td>
+            <td>To generate random data in form, press button "Generate Random Data"</td>
         </tr>
     </table>
     <fieldset id="addForm">
@@ -90,6 +93,8 @@
                 <th style="width:6em">Zip Code</th>
                 <th style="width:16em">Address</th>
                 <th style="width:6em">Phone number</th>
+                <th style="width:5em">Delete</th>
+                <th style="width:5em" >Edit</th>
 
             </thead>
         </table>
@@ -162,6 +167,7 @@
                         '<td class="AddressCity">' + cursor.value.address + '</td>' +
                         '<td class="PhoneNumber">' + cursor.value.phone + '</td>' +
                         '<td><button style="background-color:red;" onClick="deleteEmployee(\'' + cursor.key +'\')">X</button>' +
+                        '<td><button style="background-color:yellow;" onClick="editEmployee(\'' + cursor.key +'\')">X</button>' +
                         '</tr>');
                 } else {
                     $('thead').after(employees); // no more events
@@ -253,7 +259,8 @@
                             '<td class="PostalNumber">' + cursor.value.postal + '</td>' +
                             '<td class="AddressCity">' + cursor.value.address + '</td>' +
                             '<td class="PhoneNumber">' + cursor.value.phone + '</td>' +
-                            '<td><button style="background-color:red;" onClick="deleteEmployee(\'' + cursor.key + '\')">X</button>' +
+                            '<td><button class="tableFilds" style="background-color:red;" onClick="deleteEmployee(\'' + cursor.key + '\')">X</button>' +
+                            '<td><button class="tableFilds" style="background-color:yellow;" onClick="editEmployee(\'' + cursor.key +'\')">X</button>' +
                             '</tr>');
                     }
                 } else {
@@ -293,6 +300,36 @@
             document.getElementById("add_address").value = generateRandomAddress();
             document.getElementById("add_phone").value = Math.floor(Math.random() * 899 + 100).toString() + '-' +Math.floor(Math.random() * 899 + 100).toString() + '-' + Math.floor(Math.random() * 899 + 100).toString();
         }
+
+        function editEmployee(x) {
+            var employeeID = parseInt(x);
+            var request = db.transaction(["employee"], "readwrite").objectStore("employee").delete(employeeID);
+
+            var name = $('#add_name').val();
+            var surname = $('#add_surname').val();
+            var email = $('#add_email').val();
+            var company = $('#add_company').val();
+            var city = $('#add_city').val();
+            var postal = $('#add_postal').val();
+            var address = $('#add_address').val();
+            var phone = $('#add_phone').val();
+
+            var request = db.transaction(["employee"], "readwrite").objectStore("employee").add({
+                        id: employeeID,
+                        name: name,
+                        surname: surname,
+                        email: email,
+                        company: company,
+                        city: city,
+                        postal: postal,
+                        address: address,
+                        phone: phone,
+                    });
+            request.onsuccess = function (event) {
+                loadTable();
+                clearButtons();
+            };
+        };
 
         function refresh() {
             loadTable();

@@ -16,7 +16,8 @@
         }
         .tableFilds{
             display: block;
-            width: 50px;
+            margin-right: auto;
+            margin-left: auto;
         }
     </style>
 </head>
@@ -77,8 +78,6 @@
     <fieldset id="addForm">
         <legend>Serch</legend>
         <input type="text" id="search" placeholder="Wyszukaj tekst w tabeli"></input>
-        <button onclick="searchtable()">Search</button>
-        <button onclick="refresh()">Refresh</button>
     </fieldset>
     <fieldset id="addForm">
         <legend>Results</legend>
@@ -166,8 +165,8 @@
                         '<td class="PostalNumber">' + cursor.value.postal + '</td>' +
                         '<td class="AddressCity">' + cursor.value.address + '</td>' +
                         '<td class="PhoneNumber">' + cursor.value.phone + '</td>' +
-                        '<td><button style="background-color:red;" onClick="deleteEmployee(\'' + cursor.key +'\')">X</button>' +
-                        '<td><button style="background-color:yellow;" onClick="editEmployee(\'' + cursor.key +'\')">X</button>' +
+                        '<td><button class="tableFilds" style="background-color:red;" onClick="deleteEmployee(\'' + cursor.key +'\')">X</button>' +
+                        '<td><button class="tableFilds" style="background-color:yellow;" onClick="editEmployee(\'' + cursor.key +'\')">-></button>' +
                         '</tr>');
                 } else {
                     $('thead').after(employees); // no more events
@@ -231,44 +230,6 @@
             $('#add_phone').val("");
         };
 
-        function searchtable() {
-            var employees = "";
-            $('.employee').remove();
-            var objectStore = db.transaction("employee").objectStore("employee");
-            objectStore.openCursor().onsuccess = function (event) {
-                var cursor = event.target.result;
-                if (cursor) {
-                    if ((cursor.value.name.toLowerCase() +
-                            cursor.value.surname.toLowerCase() +
-                            cursor.value.email.toString() +
-                            cursor.value.company.toLowerCase() +
-                            cursor.value.city.toString() +
-                            cursor.value.postal.toLowerCase() +
-                            cursor.value.address.toLowerCase() +
-                            cursor.value.phone.toLowerCase()).includes($('#search').val().toLowerCase().replace(
-                            / /g,
-                            ''))) {
-                        employees = employees.concat(
-                            '<tr class="employee">' +
-                            '<td class="ID">' + cursor.key + '</td>' +
-                            '<td class="Imie">' + cursor.value.name + '</td>' +
-                            '<td class="Nazwisko">' + cursor.value.surname + '</td>' +
-                            '<td class="Email">' + cursor.value.email + '</td>' +
-                            '<td class="CompanyName">' + cursor.value.company + '</td>' +
-                            '<td class="CityName">' + cursor.value.city + '</td>' +
-                            '<td class="PostalNumber">' + cursor.value.postal + '</td>' +
-                            '<td class="AddressCity">' + cursor.value.address + '</td>' +
-                            '<td class="PhoneNumber">' + cursor.value.phone + '</td>' +
-                            '<td><button class="tableFilds" style="background-color:red;" onClick="deleteEmployee(\'' + cursor.key + '\')">X</button>' +
-                            '<td><button class="tableFilds" style="background-color:yellow;" onClick="editEmployee(\'' + cursor.key +'\')">X</button>' +
-                            '</tr>');
-                    }
-                } else {
-                    $('thead').after(employees); // no more events
-                }
-                cursor.continue();
-            };
-        }
         const alphabet = "abcdefghijklmnopqrstuvwxyz";
         const bigAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -331,9 +292,45 @@
             };
         };
 
-        function refresh() {
-            loadTable();
-        }
+        document.querySelector("#search").addEventListener('input', function() {
+            // console.log(document.querySelector("#search").value);
+            var employees = "";
+            $('.employee').remove();
+            var objectStore = db.transaction("employee").objectStore("employee");
+            objectStore.openCursor().onsuccess = function (event) {
+                var cursor = event.target.result;
+                if (cursor) {
+                    if ((cursor.value.name.toLowerCase() +
+                            cursor.value.surname.toLowerCase() +
+                            cursor.value.email.toString() +
+                            cursor.value.company.toLowerCase() +
+                            cursor.value.city.toString() +
+                            cursor.value.postal.toLowerCase() +
+                            cursor.value.address.toLowerCase() +
+                            cursor.value.phone.toLowerCase()).includes($('#search').val().toLowerCase().replace(
+                            / /g,
+                            ''))) {
+                        employees = employees.concat(
+                            '<tr class="employee">' +
+                            '<td class="ID">' + cursor.key + '</td>' +
+                            '<td class="Imie">' + cursor.value.name + '</td>' +
+                            '<td class="Nazwisko">' + cursor.value.surname + '</td>' +
+                            '<td class="Email">' + cursor.value.email + '</td>' +
+                            '<td class="CompanyName">' + cursor.value.company + '</td>' +
+                            '<td class="CityName">' + cursor.value.city + '</td>' +
+                            '<td class="PostalNumber">' + cursor.value.postal + '</td>' +
+                            '<td class="AddressCity">' + cursor.value.address + '</td>' +
+                            '<td class="PhoneNumber">' + cursor.value.phone + '</td>' +
+                            '<td><button class="tableFilds" style="background-color:red;" onClick="deleteEmployee(\'' + cursor.key + '\')">X</button>' +
+                            '<td><button class="tableFilds" style="background-color:yellow;" onClick="editEmployee(\'' + cursor.key +'\')">-></button>' +
+                            '</tr>');
+                    }
+                } else {
+                    $('thead').after(employees); // no more events
+                }
+                cursor.continue();
+            };     
+        });
     </script>
 </body>
 

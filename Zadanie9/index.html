@@ -361,20 +361,24 @@
             });
             console.log(pickItems);
 
-            let users = document.querySelectorAll(`.employee`);
-            let user = '';
+            let users = Array.from(document.querySelectorAll(`.employee`));
+            let checkUser = "";
             users.forEach(function(user){
-                if(user.checked){
-                user += `Imie:`
+                if(user.querySelector(".checkUser #userID").checked){
+                    checkUser += `Imie: ${user.querySelector(`.Imie`).innerText} \n`;
+                    checkUser += `Nazwisko: ${user.querySelector(`.Nazwisko`).innerText} \n`;
+                    checkUser += `Email: ${user.querySelector(`.Email`).innerText} \n`;
+                    checkUser += `Nazwa firmy: ${user.querySelector(`.CompanyName`).innerText} \n`;
+                    checkUser += `Miasto: ${user.querySelector(`.CityName`).innerText} \n`;
+                    checkUser += `Kod pocztowy: ${user.querySelector(`.PostalNumber`).innerText} \n`;
+                    checkUser += `Adres: ${user.querySelector(`.AddressCity`).innerText} \n`;
+                    checkUser += `Numer telefonu: ${user.querySelector(`.PhoneNumber`).innerText}`;
                 }
             });
-            console.log(user);
+            console.log(checkUser);
+            
         }
 
-
-        
-
-        
     </script>
 </body>
 
